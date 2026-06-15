@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVA — Matriz de Agentes IA</title>
+<meta name="description" content="NOVA — Ecosistema de agentes de inteligencia artificial para los negocios de Colombia. MAGNUS, AXON, BARBER IA, CORTEX y MENTOR IA.">
+<meta name="theme-color" content="#050505">
+
+<!-- Open Graph -->
+<meta property="og:title" content="NOVA — Matriz de Agentes IA">
+<meta property="og:description" content="El ecosistema de IA que redefine el mañana. Agentes autónomos para tu negocio y tu vida.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/nova-n.png">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="assets/nova-n.png">
+<script>
+  tailwind.config = {
+    theme: {
+      fontFamily: {
+        sans: ['"Space Grotesk"', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
+      },
+    },
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; background: #050505; }
+  body { margin: 0; font-family: "Space Grotesk", sans-serif; }
+
+  .logo-n {
+    filter: brightness(1.9) contrast(1.05)
+            drop-shadow(0 0 14px var(--accent-glow))
+            drop-shadow(0 2px 30px var(--accent-glow));
+  }
+  @media (max-height: 700px) {
+    .hero-logo { width: 4.5rem !important; margin-bottom: 1.5rem !important; }
+  }
+
+  .hero-glow {
+    position: absolute; inset: 0; pointer-events: none;
+    opacity: var(--glow-opacity, 0.55);
+    background:
+      radial-gradient(ellipse 55% 38% at 50% -8%, var(--accent-glow), transparent 70%),
+      radial-gradient(ellipse 30% 22% at 82% 78%, var(--accent-glow), transparent 70%);
+    filter: blur(8px);
+  }
+  .sim-glow {
+    position: absolute; inset: -10% -20%; pointer-events: none; z-index: -1;
+    opacity: calc(var(--glow-opacity, 0.55) * 0.5);
+    background: radial-gradient(ellipse 45% 45% at 50% 55%, var(--accent-glow), transparent 70%);
+    filter: blur(30px);
+  }
+  .text-glow {
+    color: var(--accent);
+    text-shadow: 0 0 40px var(--accent-glow);
+  }
+
+  @property --angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+  .glow-btn::before {
+    content: ""; position: absolute; inset: -1px; border-radius: 9999px;
+    background: conic-gradient(from var(--angle), transparent 10%, var(--accent) 25%, transparent 40%, transparent 60%, var(--accent) 75%, transparent 90%);
+    animation: spin-angle 3.2s linear infinite;
+  }
+  .glow-btn::after {
+    content: ""; position: absolute; inset: -1px; border-radius: 9999px; z-index: -1;
+    background: conic-gradient(from var(--angle), transparent 10%, var(--accent) 25%, transparent 40%, transparent 60%, var(--accent) 75%, transparent 90%);
+    animation: spin-angle 3.2s linear infinite;
+    filter: blur(14px); opacity: var(--glow-opacity, 0.55);
+  }
+  .glow-btn:hover::before, .glow-btn:hover::after { animation-duration: 1.4s; }
+  @keyframes spin-angle { to { --angle: 360deg; } }
+  @media (prefers-reduced-motion: reduce) {
+    .glow-btn::before, .glow-btn::after { animation: none; background: var(--accent); }
+  }
+
+  .eq-bar {
+    transform-origin: center;
+    animation: eq 1s ease-in-out infinite alternate;
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+  @keyframes eq {
+    from { transform: scaleY(0.25); opacity: 0.5; }
+    to   { transform: scaleY(1);    opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) { .eq-bar { animation: none; } }
+
+  .animate-modal-fade { animation: modal-fade 0.25s ease both; }
+  .animate-modal-pop { animation: modal-pop 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  @keyframes modal-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes modal-pop {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .flow-line {
+    stroke-dasharray: 5 16;
+    stroke-linecap: round;
+    animation: line-flow linear infinite;
+  }
+  @keyframes line-flow {
+    to { stroke-dashoffset: -210; }
+  }
+  @media (prefers-reduced-motion: reduce) { .flow-line { animation: none; stroke-dasharray: none; } }
+
+  .node-dot {
+    opacity: 0.25;
+    box-shadow: 0 0 8px var(--accent-glow);
+    animation: node-pulse 4s ease-in-out infinite;
+  }
+  @keyframes node-pulse {
+    0%, 100% { opacity: 0.18; }
+    50% { opacity: 0.55; }
+  }
+  @media (prefers-reduced-motion: reduce) { .node-dot { animation: none; } }
+
+  .caret { animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .sim-enter { animation: sim-in 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  @keyframes sim-in {
+    from { opacity: 0; transform: translateY(18px) scale(0.985); filter: blur(6px); }
+    to   { opacity: 1; transform: none; filter: none; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .animate-fade-1, .animate-fade-2, .animate-fade-3 {
+      animation: fade-up 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+    .animate-fade-2 { animation-delay: 0.15s; }
+    .animate-fade-3 { animation-delay: 0.35s; }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- React de PRODUCCIÓN (sin Babel en runtime: el JSX ya viene compilado) -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+
+<!-- Componentes NOVA ya compilados a JS plano -->
+<script src="components.js" defer></script>
+</body>
+</html>
