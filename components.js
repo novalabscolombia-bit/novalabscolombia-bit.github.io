@@ -1,11 +1,669 @@
+// NOVA — bundle compilado desde los .jsx de Claude Design (no editar a mano).
+// Orden: tweaks-panel.jsx → nova-sim.jsx → nova-magnus.jsx → nova-pricing.jsx → nova-business.jsx → nova-policies.jsx → nova-details.jsx → nova-about.jsx → nova-app.jsx
 
-/* ===== useTweaks (producción) ===== */
-function useTweaks(defaults){
-  const [t] = React.useState(defaults);
-  const set = function(){};
-  return [t, set];
+/* ===== tweaks-panel.jsx ===== */
+// @ds-adherence-ignore -- omelette starter scaffold (raw elements/hex/px by design)
+
+/* BEGIN USAGE */
+// tweaks-panel.jsx
+// Reusable Tweaks shell + form-control helpers.
+// Exports (to window): useTweaks, TweaksPanel, TweakSection, TweakRow, TweakSlider,
+//   TweakToggle, TweakRadio, TweakSelect, TweakText, TweakNumber, TweakColor, TweakButton.
+//
+// Owns the host protocol (listens for __activate_edit_mode / __deactivate_edit_mode,
+// posts __edit_mode_available / __edit_mode_set_keys / __edit_mode_dismissed) so
+// individual prototypes don't re-roll it. Ships a consistent set of controls so you
+// don't hand-draw <input type="range">, segmented radios, steppers, etc.
+//
+// Usage (in an HTML file that loads React + Babel):
+//
+//   const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+//     "primaryColor": "#D97757",
+//     "palette": ["#D97757", "#29261b", "#f6f4ef"],
+//     "fontSize": 16,
+//     "density": "regular",
+//     "dark": false
+//   }/*EDITMODE-END*/;
+//
+//   function App() {
+//     const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+//     return (
+//       <div style={{ fontSize: t.fontSize, color: t.primaryColor }}>
+//         Hello
+//         <TweaksPanel>
+//           <TweakSection label="Typography" />
+//           <TweakSlider label="Font size" value={t.fontSize} min={10} max={32} unit="px"
+//                        onChange={(v) => setTweak('fontSize', v)} />
+//           <TweakRadio  label="Density" value={t.density}
+//                        options={['compact', 'regular', 'comfy']}
+//                        onChange={(v) => setTweak('density', v)} />
+//           <TweakSection label="Theme" />
+//           <TweakColor  label="Primary" value={t.primaryColor}
+//                        options={['#D97757', '#2A6FDB', '#1F8A5B', '#7A5AE0']}
+//                        onChange={(v) => setTweak('primaryColor', v)} />
+//           <TweakColor  label="Palette" value={t.palette}
+//                        options={[['#D97757', '#29261b', '#f6f4ef'],
+//                                  ['#475569', '#0f172a', '#f1f5f9']]}
+//                        onChange={(v) => setTweak('palette', v)} />
+//           <TweakToggle label="Dark mode" value={t.dark}
+//                        onChange={(v) => setTweak('dark', v)} />
+//         </TweaksPanel>
+//       </div>
+//     );
+//   }
+//
+// TweakRadio is the segmented control for 2–3 short options (auto-falls-back to
+// TweakSelect past ~16/~10 chars per label); reach for TweakSelect directly when
+// options are many or long. For color tweaks always curate 3-4 options rather than
+// a free picker; an option can also be a whole 2–5 color palette (the stored value
+// is the array). The Tweak* controls are a floor, not a ceiling — build custom
+// controls inside the panel if a tweak calls for UI they don't cover.
+/* END USAGE */
+// ─────────────────────────────────────────────────────────────────────────────
+
+const __TWEAKS_STYLE = `
+  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;
+    max-height:calc(100vh - 32px);display:flex;flex-direction:column;
+    transform:scale(var(--dc-inv-zoom,1));transform-origin:bottom right;
+    background:rgba(250,249,247,.78);color:#29261b;
+    -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
+    border:.5px solid rgba(255,255,255,.6);border-radius:14px;
+    box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.18);
+    font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+  .twk-hd{display:flex;align-items:center;justify-content:space-between;
+    padding:10px 8px 10px 14px;cursor:move;user-select:none}
+  .twk-hd b{font-size:12px;font-weight:600;letter-spacing:.01em}
+  .twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);
+    width:22px;height:22px;border-radius:6px;cursor:default;font-size:13px;line-height:1}
+  .twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}
+  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;
+    overflow-y:auto;overflow-x:hidden;min-height:0;
+    scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.15) transparent}
+  .twk-body::-webkit-scrollbar{width:8px}
+  .twk-body::-webkit-scrollbar-track{background:transparent;margin:2px}
+  .twk-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:4px;
+    border:2px solid transparent;background-clip:content-box}
+  .twk-body::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.25);
+    border:2px solid transparent;background-clip:content-box}
+  .twk-row{display:flex;flex-direction:column;gap:5px}
+  .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .twk-lbl{display:flex;justify-content:space-between;align-items:baseline;
+    color:rgba(41,38,27,.72)}
+  .twk-lbl>span:first-child{font-weight:500}
+  .twk-val{color:rgba(41,38,27,.5);font-variant-numeric:tabular-nums}
+
+  .twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:rgba(41,38,27,.45);padding:10px 0 0}
+  .twk-sect:first-child{padding-top:0}
+
+  .twk-field{appearance:none;box-sizing:border-box;width:100%;min-width:0;height:26px;padding:0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;
+    background:rgba(255,255,255,.6);color:inherit;font:inherit;outline:none}
+  .twk-field:focus{border-color:rgba(0,0,0,.25);background:rgba(255,255,255,.85)}
+  select.twk-field{padding-right:22px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='rgba(0,0,0,.5)' d='M0 0h10L5 6z'/></svg>");
+    background-repeat:no-repeat;background-position:right 8px center}
+
+  .twk-slider{appearance:none;-webkit-appearance:none;width:100%;height:4px;margin:6px 0;
+    border-radius:999px;background:rgba(0,0,0,.12);outline:none}
+  .twk-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:14px;height:14px;border-radius:50%;background:#fff;
+    border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+  .twk-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
+    background:#fff;border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+
+  .twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;
+    background:rgba(0,0,0,.06);user-select:none}
+  .twk-seg-thumb{position:absolute;top:2px;bottom:2px;border-radius:6px;
+    background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12);
+    transition:left .15s cubic-bezier(.3,.7,.4,1),width .15s}
+  .twk-seg.dragging .twk-seg-thumb{transition:none}
+  .twk-seg button{appearance:none;position:relative;z-index:1;flex:1;border:0;
+    background:transparent;color:inherit;font:inherit;font-weight:500;min-height:22px;
+    border-radius:6px;cursor:default;padding:4px 6px;line-height:1.2;
+    overflow-wrap:anywhere}
+
+  .twk-toggle{position:relative;width:32px;height:18px;border:0;border-radius:999px;
+    background:rgba(0,0,0,.15);transition:background .15s;cursor:default;padding:0}
+  .twk-toggle[data-on="1"]{background:#34c759}
+  .twk-toggle i{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+  .twk-toggle[data-on="1"] i{transform:translateX(14px)}
+
+  .twk-num{display:flex;align-items:center;box-sizing:border-box;min-width:0;height:26px;padding:0 0 0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;background:rgba(255,255,255,.6)}
+  .twk-num-lbl{font-weight:500;color:rgba(41,38,27,.6);cursor:ew-resize;
+    user-select:none;padding-right:8px}
+  .twk-num input{flex:1;min-width:0;height:100%;border:0;background:transparent;
+    font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:0 8px 0 0;
+    outline:none;color:inherit;-moz-appearance:textfield}
+  .twk-num input::-webkit-inner-spin-button,.twk-num input::-webkit-outer-spin-button{
+    -webkit-appearance:none;margin:0}
+  .twk-num-unit{padding-right:8px;color:rgba(41,38,27,.45)}
+
+  .twk-btn{appearance:none;height:26px;padding:0 12px;border:0;border-radius:7px;
+    background:rgba(0,0,0,.78);color:#fff;font:inherit;font-weight:500;cursor:default}
+  .twk-btn:hover{background:rgba(0,0,0,.88)}
+  .twk-btn.secondary{background:rgba(0,0,0,.06);color:inherit}
+  .twk-btn.secondary:hover{background:rgba(0,0,0,.1)}
+
+  .twk-swatch{appearance:none;-webkit-appearance:none;width:56px;height:22px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:6px;padding:0;cursor:default;
+    background:transparent;flex-shrink:0}
+  .twk-swatch::-webkit-color-swatch-wrapper{padding:0}
+  .twk-swatch::-webkit-color-swatch{border:0;border-radius:5.5px}
+  .twk-swatch::-moz-color-swatch{border:0;border-radius:5.5px}
+
+  .twk-chips{display:flex;gap:6px}
+  .twk-chip{position:relative;appearance:none;flex:1;min-width:0;height:46px;
+    padding:0;border:0;border-radius:6px;overflow:hidden;cursor:default;
+    box-shadow:0 0 0 .5px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.06);
+    transition:transform .12s cubic-bezier(.3,.7,.4,1),box-shadow .12s}
+  .twk-chip:hover{transform:translateY(-1px);
+    box-shadow:0 0 0 .5px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.12)}
+  .twk-chip[data-on="1"]{box-shadow:0 0 0 1.5px rgba(0,0,0,.85),
+    0 2px 6px rgba(0,0,0,.15)}
+  .twk-chip>span{position:absolute;top:0;bottom:0;right:0;width:34%;
+    display:flex;flex-direction:column;box-shadow:-1px 0 0 rgba(0,0,0,.1)}
+  .twk-chip>span>i{flex:1;box-shadow:0 -1px 0 rgba(0,0,0,.1)}
+  .twk-chip>span>i:first-child{box-shadow:none}
+  .twk-chip svg{position:absolute;top:6px;left:6px;width:13px;height:13px;
+    filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))}
+`;
+
+// ── useTweaks ───────────────────────────────────────────────────────────────
+// Single source of truth for tweak values. setTweak persists via the host
+// (__edit_mode_set_keys → host rewrites the EDITMODE block on disk).
+function useTweaks(defaults) {
+  const [values, setValues] = React.useState(defaults);
+  // Accepts either setTweak('key', value) or setTweak({ key: value, ... }) so a
+  // useState-style call doesn't write a "[object Object]" key into the persisted
+  // JSON block.
+  const setTweak = React.useCallback((keyOrEdits, val) => {
+    const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null ? keyOrEdits : {
+      [keyOrEdits]: val
+    };
+    setValues(prev => ({
+      ...prev,
+      ...edits
+    }));
+    window.parent.postMessage({
+      type: '__edit_mode_set_keys',
+      edits
+    }, '*');
+    // Same-window signal so in-page listeners (deck-stage rail thumbnails)
+    // can react — the parent message only reaches the host, not peers.
+    window.dispatchEvent(new CustomEvent('tweakchange', {
+      detail: edits
+    }));
+  }, []);
+  return [values, setTweak];
 }
 
+// ── TweaksPanel ─────────────────────────────────────────────────────────────
+// Floating shell. Registers the protocol listener BEFORE announcing
+// availability — if the announce ran first, the host's activate could land
+// before our handler exists and the toolbar toggle would silently no-op.
+// The close button posts __edit_mode_dismissed so the host's toolbar toggle
+// flips off in lockstep; the host echoes __deactivate_edit_mode back which
+// is what actually hides the panel.
+function TweaksPanel({
+  title = 'Tweaks',
+  children
+}) {
+  const [open, setOpen] = React.useState(false);
+  const dragRef = React.useRef(null);
+  const offsetRef = React.useRef({
+    x: 16,
+    y: 16
+  });
+  const PAD = 16;
+  const clampToViewport = React.useCallback(() => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const w = panel.offsetWidth,
+      h = panel.offsetHeight;
+    const maxRight = Math.max(PAD, window.innerWidth - w - PAD);
+    const maxBottom = Math.max(PAD, window.innerHeight - h - PAD);
+    offsetRef.current = {
+      x: Math.min(maxRight, Math.max(PAD, offsetRef.current.x)),
+      y: Math.min(maxBottom, Math.max(PAD, offsetRef.current.y))
+    };
+    panel.style.right = offsetRef.current.x + 'px';
+    panel.style.bottom = offsetRef.current.y + 'px';
+  }, []);
+  React.useEffect(() => {
+    if (!open) return;
+    clampToViewport();
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', clampToViewport);
+      return () => window.removeEventListener('resize', clampToViewport);
+    }
+    const ro = new ResizeObserver(clampToViewport);
+    ro.observe(document.documentElement);
+    return () => ro.disconnect();
+  }, [open, clampToViewport]);
+  React.useEffect(() => {
+    const onMsg = e => {
+      const t = e?.data?.type;
+      if (t === '__activate_edit_mode') setOpen(true);else if (t === '__deactivate_edit_mode') setOpen(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({
+      type: '__edit_mode_available'
+    }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+  const dismiss = () => {
+    setOpen(false);
+    window.parent.postMessage({
+      type: '__edit_mode_dismissed'
+    }, '*');
+  };
+  const onDragStart = e => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const r = panel.getBoundingClientRect();
+    const sx = e.clientX,
+      sy = e.clientY;
+    const startRight = window.innerWidth - r.right;
+    const startBottom = window.innerHeight - r.bottom;
+    const move = ev => {
+      offsetRef.current = {
+        x: startRight - (ev.clientX - sx),
+        y: startBottom - (ev.clientY - sy)
+      };
+      clampToViewport();
+    };
+    const up = () => {
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', up);
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  };
+  if (!open) return null;
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("style", null, __TWEAKS_STYLE), /*#__PURE__*/React.createElement("div", {
+    ref: dragRef,
+    className: "twk-panel",
+    "data-omelette-chrome": "",
+    style: {
+      right: offsetRef.current.x,
+      bottom: offsetRef.current.y
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "twk-hd",
+    onMouseDown: onDragStart
+  }, /*#__PURE__*/React.createElement("b", null, title), /*#__PURE__*/React.createElement("button", {
+    className: "twk-x",
+    "aria-label": "Close tweaks",
+    onMouseDown: e => e.stopPropagation(),
+    onClick: dismiss
+  }, "\u2715")), /*#__PURE__*/React.createElement("div", {
+    className: "twk-body"
+  }, children)));
+}
+
+// ── Layout helpers ──────────────────────────────────────────────────────────
+
+function TweakSection({
+  label,
+  children
+}) {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "twk-sect"
+  }, label), children);
+}
+function TweakRow({
+  label,
+  value,
+  children,
+  inline = false
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: inline ? 'twk-row twk-row-h' : 'twk-row'
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "twk-lbl"
+  }, /*#__PURE__*/React.createElement("span", null, label), value != null && /*#__PURE__*/React.createElement("span", {
+    className: "twk-val"
+  }, value)), children);
+}
+
+// ── Controls ────────────────────────────────────────────────────────────────
+
+function TweakSlider({
+  label,
+  value,
+  min = 0,
+  max = 100,
+  step = 1,
+  unit = '',
+  onChange
+}) {
+  return /*#__PURE__*/React.createElement(TweakRow, {
+    label: label,
+    value: `${value}${unit}`
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    className: "twk-slider",
+    min: min,
+    max: max,
+    step: step,
+    value: value,
+    onChange: e => onChange(Number(e.target.value))
+  }));
+}
+function TweakToggle({
+  label,
+  value,
+  onChange
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "twk-row twk-row-h"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "twk-lbl"
+  }, /*#__PURE__*/React.createElement("span", null, label)), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "twk-toggle",
+    "data-on": value ? '1' : '0',
+    role: "switch",
+    "aria-checked": !!value,
+    onClick: () => onChange(!value)
+  }, /*#__PURE__*/React.createElement("i", null)));
+}
+function TweakRadio({
+  label,
+  value,
+  options,
+  onChange
+}) {
+  const trackRef = React.useRef(null);
+  const [dragging, setDragging] = React.useState(false);
+  // The active value is read by pointer-move handlers attached for the lifetime
+  // of a drag — ref it so a stale closure doesn't fire onChange for every move.
+  const valueRef = React.useRef(value);
+  valueRef.current = value;
+
+  // Segments wrap mid-word once per-segment width runs out. The track is
+  // ~248px (280 panel − 28 body pad − 4 seg pad), each button loses 12px
+  // to its own padding, and 11.5px system-ui averages ~6.3px/char — so 2
+  // options fit ~16 chars each, 3 fit ~10. Past that (or >3 options), fall
+  // back to a dropdown rather than wrap.
+  const labelLen = o => String(typeof o === 'object' ? o.label : o).length;
+  const maxLen = options.reduce((m, o) => Math.max(m, labelLen(o)), 0);
+  const fitsAsSegments = maxLen <= ({
+    2: 16,
+    3: 10
+  }[options.length] ?? 0);
+  if (!fitsAsSegments) {
+    // <select> emits strings — map back to the original option value so the
+    // fallback stays type-preserving (numbers, booleans) like the segment path.
+    const resolve = s => {
+      const m = options.find(o => String(typeof o === 'object' ? o.value : o) === s);
+      return m === undefined ? s : typeof m === 'object' ? m.value : m;
+    };
+    return /*#__PURE__*/React.createElement(TweakSelect, {
+      label: label,
+      value: value,
+      options: options,
+      onChange: s => onChange(resolve(s))
+    });
+  }
+  const opts = options.map(o => typeof o === 'object' ? o : {
+    value: o,
+    label: o
+  });
+  const idx = Math.max(0, opts.findIndex(o => o.value === value));
+  const n = opts.length;
+  const segAt = clientX => {
+    const r = trackRef.current.getBoundingClientRect();
+    const inner = r.width - 4;
+    const i = Math.floor((clientX - r.left - 2) / inner * n);
+    return opts[Math.max(0, Math.min(n - 1, i))].value;
+  };
+  const onPointerDown = e => {
+    setDragging(true);
+    const v0 = segAt(e.clientX);
+    if (v0 !== valueRef.current) onChange(v0);
+    const move = ev => {
+      if (!trackRef.current) return;
+      const v = segAt(ev.clientX);
+      if (v !== valueRef.current) onChange(v);
+    };
+    const up = () => {
+      setDragging(false);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+  return /*#__PURE__*/React.createElement(TweakRow, {
+    label: label
+  }, /*#__PURE__*/React.createElement("div", {
+    ref: trackRef,
+    role: "radiogroup",
+    onPointerDown: onPointerDown,
+    className: dragging ? 'twk-seg dragging' : 'twk-seg'
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "twk-seg-thumb",
+    style: {
+      left: `calc(2px + ${idx} * (100% - 4px) / ${n})`,
+      width: `calc((100% - 4px) / ${n})`
+    }
+  }), opts.map(o => /*#__PURE__*/React.createElement("button", {
+    key: o.value,
+    type: "button",
+    role: "radio",
+    "aria-checked": o.value === value
+  }, o.label))));
+}
+function TweakSelect({
+  label,
+  value,
+  options,
+  onChange
+}) {
+  return /*#__PURE__*/React.createElement(TweakRow, {
+    label: label
+  }, /*#__PURE__*/React.createElement("select", {
+    className: "twk-field",
+    value: value,
+    onChange: e => onChange(e.target.value)
+  }, options.map(o => {
+    const v = typeof o === 'object' ? o.value : o;
+    const l = typeof o === 'object' ? o.label : o;
+    return /*#__PURE__*/React.createElement("option", {
+      key: v,
+      value: v
+    }, l);
+  })));
+}
+function TweakText({
+  label,
+  value,
+  placeholder,
+  onChange
+}) {
+  return /*#__PURE__*/React.createElement(TweakRow, {
+    label: label
+  }, /*#__PURE__*/React.createElement("input", {
+    className: "twk-field",
+    type: "text",
+    value: value,
+    placeholder: placeholder,
+    onChange: e => onChange(e.target.value)
+  }));
+}
+function TweakNumber({
+  label,
+  value,
+  min,
+  max,
+  step = 1,
+  unit = '',
+  onChange
+}) {
+  const clamp = n => {
+    if (min != null && n < min) return min;
+    if (max != null && n > max) return max;
+    return n;
+  };
+  const startRef = React.useRef({
+    x: 0,
+    val: 0
+  });
+  const onScrubStart = e => {
+    e.preventDefault();
+    startRef.current = {
+      x: e.clientX,
+      val: value
+    };
+    const decimals = (String(step).split('.')[1] || '').length;
+    const move = ev => {
+      const dx = ev.clientX - startRef.current.x;
+      const raw = startRef.current.val + dx * step;
+      const snapped = Math.round(raw / step) * step;
+      onChange(clamp(Number(snapped.toFixed(decimals))));
+    };
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "twk-num"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "twk-num-lbl",
+    onPointerDown: onScrubStart
+  }, label), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: value,
+    min: min,
+    max: max,
+    step: step,
+    onChange: e => onChange(clamp(Number(e.target.value)))
+  }), unit && /*#__PURE__*/React.createElement("span", {
+    className: "twk-num-unit"
+  }, unit));
+}
+
+// Relative-luminance contrast pick — checkmarks drawn over a swatch need to
+// read on both #111 and #fafafa without per-option configuration. Hex input
+// only (#rgb / #rrggbb); named or rgb()/hsl() colors fall through to "light".
+function __twkIsLight(hex) {
+  const h = String(hex).replace('#', '');
+  const x = h.length === 3 ? h.replace(/./g, c => c + c) : h.padEnd(6, '0');
+  const n = parseInt(x.slice(0, 6), 16);
+  if (Number.isNaN(n)) return true;
+  const r = n >> 16 & 255,
+    g = n >> 8 & 255,
+    b = n & 255;
+  return r * 299 + g * 587 + b * 114 > 148000;
+}
+const __TwkCheck = ({
+  light
+}) => /*#__PURE__*/React.createElement("svg", {
+  viewBox: "0 0 14 14",
+  "aria-hidden": "true"
+}, /*#__PURE__*/React.createElement("path", {
+  d: "M3 7.2 5.8 10 11 4.2",
+  fill: "none",
+  strokeWidth: "2.2",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  stroke: light ? 'rgba(0,0,0,.78)' : '#fff'
+}));
+
+// TweakColor — curated color/palette picker. Each option is either a single
+// hex string or an array of 1-5 hex strings; the card adapts — a lone color
+// renders solid, a palette renders colors[0] as the hero (left ~2/3) with the
+// rest stacked in a sharp column on the right. onChange emits the
+// option in the shape it was passed (string stays string, array stays array).
+// Without options it falls back to the native color input for back-compat.
+function TweakColor({
+  label,
+  value,
+  options,
+  onChange
+}) {
+  if (!options || !options.length) {
+    return /*#__PURE__*/React.createElement("div", {
+      className: "twk-row twk-row-h"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "twk-lbl"
+    }, /*#__PURE__*/React.createElement("span", null, label)), /*#__PURE__*/React.createElement("input", {
+      type: "color",
+      className: "twk-swatch",
+      value: value,
+      onChange: e => onChange(e.target.value)
+    }));
+  }
+  // Native <input type=color> emits lowercase hex per the HTML spec, so
+  // compare case-insensitively. String() guards JSON.stringify(undefined),
+  // which returns the primitive undefined (no .toLowerCase).
+  const key = o => String(JSON.stringify(o)).toLowerCase();
+  const cur = key(value);
+  return /*#__PURE__*/React.createElement(TweakRow, {
+    label: label
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "twk-chips",
+    role: "radiogroup"
+  }, options.map((o, i) => {
+    const colors = Array.isArray(o) ? o : [o];
+    const [hero, ...rest] = colors;
+    const sup = rest.slice(0, 4);
+    const on = key(o) === cur;
+    return /*#__PURE__*/React.createElement("button", {
+      key: i,
+      type: "button",
+      className: "twk-chip",
+      role: "radio",
+      "aria-checked": on,
+      "data-on": on ? '1' : '0',
+      "aria-label": colors.join(', '),
+      title: colors.join(' · '),
+      style: {
+        background: hero
+      },
+      onClick: () => onChange(o)
+    }, sup.length > 0 && /*#__PURE__*/React.createElement("span", null, sup.map((c, j) => /*#__PURE__*/React.createElement("i", {
+      key: j,
+      style: {
+        background: c
+      }
+    }))), on && /*#__PURE__*/React.createElement(__TwkCheck, {
+      light: __twkIsLight(hero)
+    }));
+  })));
+}
+function TweakButton({
+  label,
+  onClick,
+  secondary = false
+}) {
+  return /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: secondary ? 'twk-btn secondary' : 'twk-btn',
+    onClick: onClick
+  }, label);
+}
+Object.assign(window, {
+  useTweaks,
+  TweaksPanel,
+  TweakSection,
+  TweakRow,
+  TweakSlider,
+  TweakToggle,
+  TweakRadio,
+  TweakSelect,
+  TweakText,
+  TweakNumber,
+  TweakColor,
+  TweakButton
+});
 
 /* ===== nova-sim.jsx ===== */
 // NOVA — Simuladores de agentes (MAGNUS / AXON / BARBER IA / CORTEX)
@@ -526,20 +1184,52 @@ const MAGNUS_CAPS = [{
   title: "Inteligencia que te conoce",
   items: [["Búsqueda web con IA real", "Datos de hoy, no del pasado (Gemini + Google Search)."], ["Memoria que te conoce", "Aprende tus preferencias y sincroniza tu historial de ChatGPT, Claude o Gemini."], ["Consulta tus PDFs · RAG", "Indexa tu biblioteca y responde basándose en tus propios documentos."], ["Intel de personas", "Perfiles con foto, biografía y datos clave, al estilo Iron Man."], ["Se adapta a tu humor", "Detecta si estás cansado o frustrado y ajusta su tono."], ["Guardian silencioso", "Analiza el sistema en segundo plano y te alerta de riesgos."]]
 }];
+function CapItem({
+  name,
+  desc
+}) {
+  const [open, setOpen] = useMagState(false);
+  return /*#__PURE__*/React.createElement("li", {
+    className: "border-b border-white/[0.05] last:border-0 pb-3 last:pb-0"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setOpen(v => !v),
+    "aria-expanded": open,
+    className: "w-full flex items-center gap-3 text-left group outline-none"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "w-1.5 h-1.5 shrink-0 rounded-full transition-all duration-300 " + (open ? "bg-[var(--accent)] shadow-[0_0_8px_var(--accent)]" : "bg-white/30 group-hover:bg-[var(--accent)]")
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "text-sm font-medium flex-1 transition-colors " + (open ? "text-[var(--accent)]" : "text-white/85 group-hover:text-white")
+  }, name), /*#__PURE__*/React.createElement("span", {
+    className: "font-mono text-base leading-none shrink-0 transition-transform duration-300 " + (open ? "rotate-45 text-[var(--accent)]" : "text-white/30 group-hover:text-white/60")
+  }, "+")), /*#__PURE__*/React.createElement("div", {
+    className: "grid transition-all duration-300 ease-out " + (open ? "grid-rows-[1fr] opacity-100 mt-1.5" : "grid-rows-[0fr] opacity-0")
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "overflow-hidden"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "text-sm text-white/45 leading-relaxed pl-[18px] pr-2"
+  }, desc))));
+}
 function MagnusCapabilities() {
   return /*#__PURE__*/React.createElement("div", {
     className: "mt-14"
   }, /*#__PURE__*/React.createElement("p", {
-    className: "max-w-2xl text-base md:text-lg text-white/55 leading-relaxed mb-12"
+    "data-reveal": true,
+    className: "max-w-2xl mx-auto text-center text-base md:text-lg text-white/55 leading-relaxed mb-12"
   }, "No es una app m\xE1s. ", /*#__PURE__*/React.createElement("span", {
     className: "text-white"
-  }, "Magnus vive en tu computador"), ", entiende lo que dices, ejecuta lo que necesitas y aprende qui\xE9n eres \u2014 todo con tu voz, y sin depender de la nube de terceros para lo esencial."), /*#__PURE__*/React.createElement(Eyebrow, {
+  }, "Magnus vive en tu computador"), ", entiende lo que dices, ejecuta lo que necesitas y aprende qui\xE9n eres \u2014 todo con tu voz."), /*#__PURE__*/React.createElement(Eyebrow, {
     icon: "Sparkles",
     className: "mb-6"
-  }, "Todo lo que Magnus hace por ti"), /*#__PURE__*/React.createElement("div", {
+  }, "Todo lo que Magnus hace por ti"), /*#__PURE__*/React.createElement("p", {
+    className: "text-sm text-white/35 font-mono mb-6"
+  }, "Toca cualquier funci\xF3n para ver el detalle \u2014\u2009", /*#__PURE__*/React.createElement("span", {
+    className: "text-[var(--accent)]"
+  }, "+")), /*#__PURE__*/React.createElement("div", {
     className: "grid md:grid-cols-2 gap-4"
-  }, MAGNUS_CAPS.map(cat => /*#__PURE__*/React.createElement("div", {
+  }, MAGNUS_CAPS.map((cat, ci) => /*#__PURE__*/React.createElement("div", {
     key: cat.title,
+    "data-reveal": true,
+    "data-reveal-delay": ci * 80 + "ms",
     className: "rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 md:p-7"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-center gap-3 mb-6"
@@ -551,28 +1241,45 @@ function MagnusCapabilities() {
   })), /*#__PURE__*/React.createElement("h4", {
     className: "text-lg font-medium text-white"
   }, cat.title)), /*#__PURE__*/React.createElement("ul", {
-    className: "flex flex-col gap-4"
-  }, cat.items.map(([name, desc]) => /*#__PURE__*/React.createElement("li", {
+    className: "flex flex-col gap-3"
+  }, cat.items.map(([name, desc]) => /*#__PURE__*/React.createElement(CapItem, {
     key: name,
-    className: "flex gap-3"
+    name: name,
+    desc: desc
+  })))))), /*#__PURE__*/React.createElement(MagnusUpdatesBanner, null));
+}
+function MagnusUpdatesBanner() {
+  return /*#__PURE__*/React.createElement("div", {
+    "data-reveal": "scale",
+    className: "updates-banner relative mt-8 overflow-hidden rounded-2xl border border-[var(--accent)]/40 p-7 md:p-8"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "absolute inset-0 pointer-events-none",
+    style: {
+      background: "radial-gradient(ellipse 60% 120% at 0% 50%, var(--accent-glow), transparent 60%)",
+      opacity: 0.5
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "relative flex flex-col sm:flex-row sm:items-center gap-5"
   }, /*#__PURE__*/React.createElement("span", {
-    className: "mt-[7px] w-1.5 h-1.5 shrink-0 rounded-full bg-[var(--accent)] shadow-[0_0_8px_var(--accent)]"
-  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
-    className: "text-sm text-white/85 font-medium"
-  }, name), /*#__PURE__*/React.createElement("p", {
-    className: "text-sm text-white/40 leading-relaxed"
-  }, desc)))))))), /*#__PURE__*/React.createElement("div", {
-    className: "mt-8 flex items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.02] px-5 py-4"
+    className: "w-14 h-14 shrink-0 rounded-2xl grid place-items-center bg-[var(--accent)] text-black shadow-[0_0_30px_-4px_var(--accent-glow)]"
   }, /*#__PURE__*/React.createElement("span", {
-    className: "w-8 h-8 shrink-0 rounded-lg grid place-items-center border border-white/15 text-white/50"
+    className: "banner-spin grid place-items-center"
   }, /*#__PURE__*/React.createElement(LIcon, {
-    name: "RefreshCw",
-    size: 15
-  })), /*#__PURE__*/React.createElement("p", {
-    className: "text-sm text-white/50 leading-relaxed"
+    name: "Sparkles",
+    size: 26
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "flex-1"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2.5 mb-1.5"
   }, /*#__PURE__*/React.createElement("span", {
-    className: "text-white/80 font-medium"
-  }, "Magnus mejora cada mes."), " Nuevas funciones, mayor precisi\xF3n de voz y nuevas integraciones \u2014 incluidas en tu suscripci\xF3n, sin pagar nada adicional.")));
+    className: "inline-flex items-center gap-1.5 rounded-full bg-[var(--accent)]/15 border border-[var(--accent)]/40 px-2.5 py-0.5 font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--accent)]"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse"
+  }), " Novedad")), /*#__PURE__*/React.createElement("h4", {
+    className: "text-xl md:text-2xl font-medium text-white"
+  }, "Magnus mejora cada mes \u2014 sin pagar nada extra."), /*#__PURE__*/React.createElement("p", {
+    className: "text-sm md:text-base text-white/55 leading-relaxed mt-1.5"
+  }, "Nuevas funciones, voz m\xE1s precisa y nuevas integraciones llegan solas a tu suscripci\xF3n. Compras Magnus una vez; crece para siempre."))));
 }
 
 /* ============================================================
@@ -717,7 +1424,7 @@ const MAGNUS_PLANS = [{
   cop: "20.000",
   usd: "≈ $5 USD",
   featured: false,
-  features: ["Núcleo central de Magnus", "Procesamiento ultrarrápido (Groq)", "Control de PC, apps y voz", "Clima, notas, alarmas y recordatorios", "Correo + Calendario + Finanzas", "1 dispositivo"]
+  features: ["Núcleo central de Magnus", "Procesamiento ultrarrápido", "Control de PC, apps y voz", "Clima, notas, alarmas y recordatorios", "Correo + Calendario + Finanzas", "1 dispositivo"]
 }, {
   id: "pro",
   name: "Pro",
@@ -727,7 +1434,7 @@ const MAGNUS_PLANS = [{
   usd: "≈ $12.5 USD",
   featured: true,
   inherits: "Básico",
-  features: ["Voz premium (ElevenLabs Flash)", "Búsqueda web avanzada en tiempo real", "Mayor contexto de memoria", "Visión por cámara + gestos", "Hogar inteligente + modos + RAG", "3 dispositivos"]
+  features: ["Voz premium y ultrarrealista", "Búsqueda web avanzada en tiempo real", "Mayor contexto de memoria", "Visión por cámara + gestos", "Hogar inteligente + modos + RAG", "3 dispositivos"]
 }, {
   id: "max",
   name: "Max",
@@ -737,7 +1444,7 @@ const MAGNUS_PLANS = [{
   usd: "≈ $30 USD",
   featured: false,
   inherits: "Pro",
-  features: ["Modelos avanzados (70B de alto uso)", "Análisis de visión e imágenes", "Asistencia experta para código", "Control avanzado del PC (scripts)", "5 dispositivos", "Soporte dedicado"]
+  features: ["Modelos avanzados de alto rendimiento", "Análisis de visión e imágenes", "Asistencia experta para código", "Control avanzado del PC (scripts)", "5 dispositivos", "Soporte dedicado"]
 }];
 const PAY_METHODS = [["Tarjeta", "CreditCard"], ["PSE", "Landmark"], ["Nequi", "Smartphone"], ["Bancolombia", "Wallet"], ["Mercado Pago", "ShoppingBag"]];
 function PlanCard({
@@ -745,13 +1452,11 @@ function PlanCard({
   onChoose
 }) {
   return /*#__PURE__*/React.createElement("div", {
-    className: "relative flex flex-col rounded-2xl border p-7 md:p-8 transition-all duration-500 " + (plan.featured ? "border-[var(--accent)]/50 bg-white/[0.04] shadow-[0_0_70px_-20px_var(--accent-glow)] md:-translate-y-3" : "border-white/[0.08] bg-white/[0.02] hover:border-white/20")
-  }, plan.featured && /*#__PURE__*/React.createElement("span", {
-    className: "absolute -top-3 left-7 font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1 rounded-full bg-[var(--accent)] text-black"
-  }, "Recomendado"), /*#__PURE__*/React.createElement("div", {
+    className: "relative w-full flex flex-col rounded-2xl border border-[var(--accent)]/45 bg-white/[0.04] p-7 md:p-8 shadow-[0_0_60px_-22px_var(--accent-glow)] transition-all duration-500 hover:border-[var(--accent)]/70 hover:-translate-y-1.5 hover:shadow-[0_0_70px_-18px_var(--accent-glow)]"
+  }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-center justify-between mb-5"
   }, /*#__PURE__*/React.createElement("span", {
-    className: "w-10 h-10 rounded-xl grid place-items-center border " + (plan.featured ? "border-[var(--accent)]/40 text-[var(--accent)] bg-[var(--accent)]/10" : "border-white/15 text-white/60")
+    className: "w-10 h-10 rounded-xl grid place-items-center border border-[var(--accent)]/40 text-[var(--accent)] bg-[var(--accent)]/10"
   }, /*#__PURE__*/React.createElement(LIcon, {
     name: plan.icon,
     size: 18
@@ -771,7 +1476,7 @@ function PlanCard({
     className: "font-mono text-[11px] text-[var(--accent)] mb-7"
   }, plan.usd, " / mes"), /*#__PURE__*/React.createElement("button", {
     onClick: () => onChoose(plan),
-    className: "w-full rounded-lg font-medium text-sm py-3.5 mb-7 transition-all " + (plan.featured ? "bg-[var(--accent)] text-black hover:brightness-110" : "border border-white/15 text-white hover:bg-white/[0.06] hover:border-white/30")
+    className: "w-full rounded-lg bg-[var(--accent)] text-black font-medium text-sm py-3.5 mb-7 hover:brightness-110 transition-all"
   }, "Suscribirme"), plan.inherits && /*#__PURE__*/React.createElement("p", {
     className: "font-mono text-[11px] text-white/45 mb-3"
   }, "Todo lo de ", plan.inherits, ", y adem\xE1s:"), /*#__PURE__*/React.createElement("ul", {
@@ -780,7 +1485,7 @@ function PlanCard({
     key: f,
     className: "flex items-start gap-3 text-sm text-white/65"
   }, /*#__PURE__*/React.createElement("span", {
-    className: "mt-0.5 shrink-0 " + (plan.featured ? "text-[var(--accent)]" : "text-white/40")
+    className: "mt-0.5 shrink-0 text-[var(--accent)]"
   }, /*#__PURE__*/React.createElement(LIcon, {
     name: "Check",
     size: 15
@@ -804,12 +1509,17 @@ function PricingSection() {
   }, "Paga seguro"), " desde aqu\xED."), /*#__PURE__*/React.createElement("p", {
     className: "mt-6 max-w-lg text-base text-white/45 leading-relaxed"
   }, "Suscr\xEDbete en segundos con tarjeta, PSE, Nequi o Bancolombia. Tu primera semana es gratis.")), /*#__PURE__*/React.createElement("div", {
-    className: "grid md:grid-cols-3 gap-5 items-start"
-  }, MAGNUS_PLANS.map(p => /*#__PURE__*/React.createElement(PlanCard, {
+    "data-reveal": true,
+    className: "grid md:grid-cols-3 gap-5 items-stretch"
+  }, MAGNUS_PLANS.map((p, i) => /*#__PURE__*/React.createElement("div", {
     key: p.id,
+    "data-reveal": true,
+    "data-reveal-delay": i * 90 + "ms",
+    className: "flex"
+  }, /*#__PURE__*/React.createElement(PlanCard, {
     plan: p,
     onChoose: setCheckout
-  }))), /*#__PURE__*/React.createElement("div", {
+  })))), /*#__PURE__*/React.createElement("div", {
     className: "mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 font-mono text-[11px] text-white/35"
   }, /*#__PURE__*/React.createElement("span", {
     className: "flex items-center gap-2"
@@ -936,11 +1646,66 @@ Object.assign(window, {
 const {
   useState: useBizState
 } = React;
-
-// ⚠️ Reemplaza por el número real de WhatsApp Business de NOVA (formato internacional, sin +)
-const WHATSAPP_NUMBER = "573000000000";
+const WHATSAPP_NUMBER = "573248874403";
+const WHATSAPP_DISPLAY = "+57 324 887 4403";
+const NOVA_EMAIL = "novalabscolombia@gmail.com";
 function waLink(text) {
   return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(text);
+}
+
+// CTA de instalación que aparece bajo la simulación de cada bot de empresa
+function InstallCTA({
+  agentId
+}) {
+  const bot = BIZ_BOTS.find(b => b.id === agentId);
+  if (!bot) return null;
+  const msg = bot.msg;
+  return /*#__PURE__*/React.createElement("div", {
+    "data-reveal": "scale",
+    className: "mt-12 relative overflow-hidden rounded-2xl border border-[var(--accent)]/30 bg-white/[0.03] p-8 md:p-10"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "absolute inset-0 pointer-events-none opacity-[0.13]",
+    style: {
+      background: "radial-gradient(ellipse 70% 80% at 85% 0%, var(--accent), transparent 70%)"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "relative flex flex-col md:flex-row md:items-center gap-7 justify-between"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "max-w-lg"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2.5 mb-4"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "w-7 h-7 rounded-lg grid place-items-center border border-[var(--accent)]/40 text-[var(--accent)] bg-[var(--accent)]/10"
+  }, /*#__PURE__*/React.createElement(LIcon, {
+    name: "Wrench",
+    size: 14
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "font-mono text-[10px] tracking-[0.25em] uppercase text-[var(--accent)]"
+  }, "Instalaci\xF3n y acompa\xF1amiento")), /*#__PURE__*/React.createElement("h3", {
+    className: "text-2xl md:text-3xl font-medium text-white leading-tight mb-3"
+  }, "\xBFListo para poner a ", /*#__PURE__*/React.createElement("span", {
+    className: "text-glow"
+  }, bot.name), " a trabajar en tu negocio?"), /*#__PURE__*/React.createElement("p", {
+    className: "text-sm md:text-base text-white/50 leading-relaxed"
+  }, "Lo instalamos, lo calibramos en tu operaci\xF3n real y te acompa\xF1amos hasta que cumpla su objetivo. Escr\xEDbenos y agendamos una demo sin costo.")), /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-col gap-3 shrink-0"
+  }, /*#__PURE__*/React.createElement("a", {
+    href: waLink(msg),
+    target: "_blank",
+    rel: "noopener noreferrer",
+    className: "glow-btn group relative inline-flex rounded-full p-px overflow-hidden"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "relative z-10 flex items-center justify-center gap-2.5 rounded-full bg-black px-7 py-3.5 text-sm font-medium text-white transition-colors group-hover:bg-[#0b0b0e]"
+  }, /*#__PURE__*/React.createElement(LIcon, {
+    name: "MessageCircle",
+    size: 16
+  }), "Solicitar instalaci\xF3n")), /*#__PURE__*/React.createElement("a", {
+    href: "mailto:" + NOVA_EMAIL,
+    className: "inline-flex items-center justify-center gap-2 font-mono text-[11px] text-white/40 hover:text-[var(--accent)] transition-colors"
+  }, /*#__PURE__*/React.createElement(LIcon, {
+    name: "Mail",
+    size: 13
+  }), NOVA_EMAIL))));
 }
 const BIZ_BOTS = [{
   id: "axon",
@@ -1031,7 +1796,7 @@ function BusinessSection() {
     size: 16
   }), "Hablar con NOVA por WhatsApp")), /*#__PURE__*/React.createElement("p", {
     className: "mt-5 font-mono text-[11px] text-white/30 leading-relaxed max-w-xs"
-  }, "Respuesta en minutos \xB7 demo gratis \xB7 planes mensuales para uno o varios locales.")), /*#__PURE__*/React.createElement("div", {
+  }, "Respuesta en segundos \xB7 planes mensuales para uno o varios locales.")), /*#__PURE__*/React.createElement("div", {
     className: "grid sm:grid-cols-2 gap-4"
   }, BIZ_BOTS.map(b => /*#__PURE__*/React.createElement(BizCard, {
     key: b.id,
@@ -1039,7 +1804,126 @@ function BusinessSection() {
   })))));
 }
 Object.assign(window, {
-  BusinessSection
+  BusinessSection,
+  InstallCTA,
+  waLink,
+  WHATSAPP_NUMBER,
+  WHATSAPP_DISPLAY,
+  NOVA_EMAIL,
+  BIZ_BOTS
+});
+
+/* ===== nova-policies.jsx ===== */
+// NOVA — Políticas públicas, confianza y respaldo
+const {
+  useState: usePolState
+} = React;
+const TRUST_BADGES = [["BadgeCheck", "Verificada por Meta", "Cuenta de WhatsApp Business oficial vía Meta Cloud API."], ["ShieldCheck", "Ley 1581 de 2012", "Tratamiento de datos conforme al régimen colombiano."], ["Lock", "Seguridad por diseño", "Cifrado, aislamiento por cliente y conexiones seguras."], ["HeartHandshake", "Acompañamiento real", "Instalación presencial y calibración en tu operación."]];
+const POLICIES = [{
+  icon: "Sparkles",
+  title: "IA responsable y honesta",
+  body: "Nuestros agentes no inventan información: cada bot opera solo sobre datos reales del negocio. «La IA propone, el sistema decide» — un motor de reglas valida cada operación crítica antes de ejecutarla. No prometemos resultados mágicos ni capacidades que la tecnología no tiene."
+}, {
+  icon: "Users",
+  title: "La IA al servicio de las personas",
+  body: "Entendemos la IA como una palanca que libera al talento humano de lo repetitivo, no como un sustituto. Diseñamos para potenciar a los equipos. Quien conversa con un agente puede saber que habla con un asistente y llegar a una persona real cuando lo necesite."
+}, {
+  icon: "ShieldCheck",
+  title: "Protección de datos personales",
+  body: "Tratamos los datos conforme al régimen colombiano (Constitución art. 15, Ley 1581 de 2012, Decreto 1377 de 2013 y Ley 1266 de 2008) y bajo responsabilidad demostrada. Solo pedimos los datos necesarios y con autorización; respetamos los derechos de habeas data (conocer, actualizar, rectificar, suprimir y revocar); nunca usamos la información para fines ajenos ni la vendemos."
+}, {
+  icon: "Lock",
+  title: "Seguridad de la información",
+  body: "Cifrado de credenciales y secretos fuera del código; conexiones HTTPS y acceso por llave; aislamiento total de los datos entre clientes; respaldos periódicos y procedimientos de respuesta a incidentes."
+}, {
+  icon: "Ban",
+  title: "Uso aceptable",
+  body: "Nuestros servicios deben usarse de forma lícita y ética. Está prohibido: actividades ilícitas, spam o mensajería masiva sin consentimiento, suplantación o acoso, engaño a usuarios finales, recolección de datos sin autorización e intentos de vulnerar la seguridad de NOVA."
+}, {
+  icon: "BadgeCheck",
+  title: "Empresa verificada por Meta",
+  body: "NOVA opera con una cuenta de WhatsApp Business verificada por Meta y la API oficial (Meta Cloud API). Cuando conversas con NOVA por WhatsApp lo haces con una empresa legítima y verificada en la plataforma oficial — no automatizaciones no autorizadas."
+}];
+function PolicyRow({
+  icon,
+  title,
+  body
+}) {
+  const [open, setOpen] = usePolState(false);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "border border-white/[0.08] rounded-xl bg-white/[0.02] overflow-hidden transition-colors hover:border-white/15"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setOpen(v => !v),
+    "aria-expanded": open,
+    className: "w-full flex items-center gap-4 px-5 py-4 text-left outline-none group"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "w-9 h-9 shrink-0 rounded-lg grid place-items-center border transition-colors " + (open ? "border-[var(--accent)]/40 text-[var(--accent)] bg-[var(--accent)]/5" : "border-white/12 text-white/50")
+  }, /*#__PURE__*/React.createElement(LIcon, {
+    name: icon,
+    size: 16
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "flex-1 text-sm md:text-base font-medium transition-colors " + (open ? "text-[var(--accent)]" : "text-white/85 group-hover:text-white")
+  }, title), /*#__PURE__*/React.createElement("span", {
+    className: "font-mono text-lg leading-none shrink-0 transition-transform duration-300 " + (open ? "rotate-45 text-[var(--accent)]" : "text-white/30")
+  }, "+")), /*#__PURE__*/React.createElement("div", {
+    className: "grid transition-all duration-400 ease-out " + (open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "overflow-hidden"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "px-5 pb-5 pl-[72px] text-sm leading-relaxed text-white/50"
+  }, body))));
+}
+function PoliciesSection() {
+  return /*#__PURE__*/React.createElement("section", {
+    id: "politicas",
+    "data-screen-label": "Pol\xEDticas y confianza",
+    className: "relative max-w-6xl mx-auto px-6 pt-24 pb-28 scroll-mt-20"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-center flex flex-col items-center mb-14"
+  }, /*#__PURE__*/React.createElement(Eyebrow, {
+    icon: "ShieldCheck",
+    className: "mb-6 justify-center"
+  }, "08 \xB7 Confianza"), /*#__PURE__*/React.createElement("h2", {
+    "data-reveal": true,
+    className: "text-3xl md:text-5xl font-medium tracking-tight text-white max-w-2xl"
+  }, "Tecnolog\xEDa seria, ", /*#__PURE__*/React.createElement("span", {
+    className: "text-glow"
+  }, "con respaldo real"), "."), /*#__PURE__*/React.createElement("p", {
+    "data-reveal": true,
+    className: "mt-6 max-w-lg text-base text-white/45 leading-relaxed"
+  }, "Operamos bajo la ley colombiana de protecci\xF3n de datos y con cuenta verificada por Meta. Esto es lo p\xFAblico de c\xF3mo trabajamos.")), /*#__PURE__*/React.createElement("div", {
+    "data-reveal": true,
+    className: "grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+  }, TRUST_BADGES.map(([icon, title, desc], i) => /*#__PURE__*/React.createElement("div", {
+    key: title,
+    "data-reveal": true,
+    "data-reveal-delay": i * 70 + "ms",
+    className: "rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "w-11 h-11 rounded-xl grid place-items-center border border-[var(--accent)]/30 text-[var(--accent)] bg-[var(--accent)]/5 shadow-[0_0_18px_-6px_var(--accent-glow)] mb-4"
+  }, /*#__PURE__*/React.createElement(LIcon, {
+    name: icon,
+    size: 19
+  })), /*#__PURE__*/React.createElement("h4", {
+    className: "text-white font-medium mb-1.5"
+  }, title), /*#__PURE__*/React.createElement("p", {
+    className: "text-sm text-white/45 leading-relaxed"
+  }, desc)))), /*#__PURE__*/React.createElement("div", {
+    className: "grid lg:grid-cols-2 gap-3 max-w-5xl mx-auto"
+  }, POLICIES.map((p, i) => /*#__PURE__*/React.createElement("div", {
+    key: p.title,
+    "data-reveal": true,
+    "data-reveal-delay": i % 2 * 80 + "ms"
+  }, /*#__PURE__*/React.createElement(PolicyRow, {
+    icon: p.icon,
+    title: p.title,
+    body: p.body
+  })))), /*#__PURE__*/React.createElement("p", {
+    className: "mt-10 text-center font-mono text-[11px] text-white/30 leading-relaxed max-w-2xl mx-auto"
+  }, "Gu\xEDa p\xFAblica de principios de NOVA S.A.S. \xB7 Barranquilla, Colombia \xB7 vigente desde junio de 2026. Los documentos legales vinculantes la complementan."));
+}
+Object.assign(window, {
+  PoliciesSection
 });
 
 /* ===== nova-details.jsx ===== */
@@ -1098,6 +1982,29 @@ function Accordion({
     className: "px-5 pb-5 text-sm leading-relaxed text-white/50"
   }, children))));
 }
+function ImpactCard({
+  title,
+  desc
+}) {
+  const [open, setOpen] = useDetState(false);
+  return /*#__PURE__*/React.createElement("button", {
+    onClick: () => setOpen(v => !v),
+    "aria-expanded": open,
+    className: "text-left rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 transition-colors hover:border-white/15 outline-none"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-start justify-between gap-3"
+  }, /*#__PURE__*/React.createElement("h4", {
+    className: "font-medium transition-colors " + (open ? "text-[var(--accent)]" : "text-white/90")
+  }, title), /*#__PURE__*/React.createElement("span", {
+    className: "font-mono text-base leading-none shrink-0 mt-0.5 transition-transform duration-300 " + (open ? "rotate-45 text-[var(--accent)]" : "text-white/30")
+  }, "+")), /*#__PURE__*/React.createElement("div", {
+    className: "grid transition-all duration-300 ease-out " + (open ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0")
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "overflow-hidden"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "text-sm text-white/45 leading-relaxed"
+  }, desc))));
+}
 function AgentDetails({
   agentId
 }) {
@@ -1116,16 +2023,17 @@ function AgentDetails({
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Eyebrow, {
     icon: "TrendingUp",
     className: "mb-6"
-  }, "Impacto real"), /*#__PURE__*/React.createElement("div", {
+  }, "Impacto real"), /*#__PURE__*/React.createElement("p", {
+    className: "text-sm text-white/35 font-mono mb-6 -mt-2"
+  }, "Toca cada beneficio para ver el detalle \u2014\u2009", /*#__PURE__*/React.createElement("span", {
+    className: "text-[var(--accent)]"
+  }, "+")), /*#__PURE__*/React.createElement("div", {
     className: "grid md:grid-cols-2 lg:grid-cols-3 gap-4"
-  }, d.impact.map(([title, desc]) => /*#__PURE__*/React.createElement("div", {
+  }, d.impact.map(([title, desc]) => /*#__PURE__*/React.createElement(ImpactCard, {
     key: title,
-    className: "rounded-xl border border-white/[0.07] bg-white/[0.02] p-5"
-  }, /*#__PURE__*/React.createElement("h4", {
-    className: "text-white/90 font-medium mb-2"
-  }, title), /*#__PURE__*/React.createElement("p", {
-    className: "text-sm text-white/45 leading-relaxed"
-  }, desc))))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Eyebrow, {
+    title: title,
+    desc: desc
+  })))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Eyebrow, {
     icon: "Settings2",
     className: "mb-6"
   }, "Bajo el cap\xF3"), /*#__PURE__*/React.createElement("div", {
@@ -1375,8 +2283,19 @@ Object.assign(window, {
 /* ===== nova-app.jsx ===== */
 // NOVA — Hero, Bento Grid, Footer, App
 const {
-  useState: useAppState
+  useState: useAppState,
+  useEffect: useAppEffect,
+  useRef: useAppRef
 } = React;
+
+// desplazamiento suave a una sección
+function scrollToId(id, offset = 56) {
+  const el = document.getElementById(id);
+  if (el) window.scrollTo({
+    top: el.offsetTop - offset,
+    behavior: "smooth"
+  });
+}
 const NOVA_AGENTS = [{
   id: "magnus",
   name: "MAGNUS",
@@ -1413,24 +2332,21 @@ const NOVA_AGENTS = [{
 /* ---------- HERO ---------- */
 
 function Hero() {
-  const goSim = () => {
-    const el = document.getElementById("ecosistema");
-    if (el) window.scrollTo({
-      top: el.offsetTop - 40,
-      behavior: "smooth"
-    });
-  };
+  const goSim = () => scrollToId("ecosistema", 40);
   return /*#__PURE__*/React.createElement("header", {
     "data-screen-label": "Hero",
     className: "relative min-h-[92vh] flex flex-col items-center justify-center px-6 pt-24 pb-14 text-center overflow-hidden"
   }, /*#__PURE__*/React.createElement("div", {
     className: "hero-glow",
     "aria-hidden": "true"
-  }), /*#__PURE__*/React.createElement("img", {
+  }), /*#__PURE__*/React.createElement("div", {
+    id: "heroLogo",
+    className: "hero-logo-wrap mb-10 animate-fade-1"
+  }, /*#__PURE__*/React.createElement("img", {
     src: "assets/nova-n.png",
     alt: "Logo NOVA",
-    className: "logo-n hero-logo w-24 md:w-32 mb-10 animate-fade-1"
-  }), /*#__PURE__*/React.createElement("p", {
+    className: "logo-n hero-logo-img w-48 md:w-64"
+  })), /*#__PURE__*/React.createElement("p", {
     className: "font-mono text-[11px] md:text-xs tracking-[0.5em] text-[var(--accent)] uppercase mb-8 animate-fade-1"
   }, "NOVA \xB7 Matriz de agentes"), /*#__PURE__*/React.createElement("h1", {
     className: "max-w-5xl text-4xl md:text-7xl font-medium leading-[1.05] tracking-tight text-white animate-fade-2"
@@ -1438,7 +2354,7 @@ function Hero() {
     className: "text-glow"
   }, "redefine el ma\xF1ana"), "."), /*#__PURE__*/React.createElement("p", {
     className: "max-w-xl mt-8 text-base md:text-lg text-white/45 leading-relaxed animate-fade-3"
-  }, "Una matriz de agentes aut\xF3nomos \u2014 MAGNUS, AXON, BARBER IA, CORTEX y MENTOR IA \u2014 que trabajan por ti mientras t\xFA decides el futuro."), /*#__PURE__*/React.createElement("div", {
+  }, "Una matriz de agentes aut\xF3nomos que trabajan por ti mientras t\xFA decides el futuro."), /*#__PURE__*/React.createElement("div", {
     className: "mt-12 animate-fade-3"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: goSim,
@@ -1457,12 +2373,13 @@ function Hero() {
 function AgentCard({
   agent,
   active,
-  onSelect
+  onSelect,
+  onGetMagnus
 }) {
   return /*#__PURE__*/React.createElement("button", {
     onClick: () => onSelect(agent.id),
     "aria-pressed": active,
-    className: "agent-card group relative text-left rounded-2xl border p-6 md:p-8 transition-all duration-500 outline-none " + (agent.big ? "md:col-span-2 md:row-span-2 md:p-10 " : "") + (active ? "border-[var(--accent)]/60 bg-white/[0.05] shadow-[0_0_60px_-15px_var(--accent-glow)]" : "border-white/[0.08] bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04]")
+    className: "agent-card group relative text-left rounded-2xl border p-6 md:p-8 transition-all duration-500 outline-none w-full h-full flex flex-col " + (agent.big ? "md:p-10 " : "") + (active ? "border-[var(--accent)]/60 bg-white/[0.05] shadow-[0_0_60px_-15px_var(--accent-glow)]" : "border-white/[0.08] bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04]")
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-center justify-between mb-5"
   }, /*#__PURE__*/React.createElement("span", {
@@ -1475,11 +2392,31 @@ function AgentCard({
     className: "text-white/45 leading-relaxed " + (agent.big ? "text-base md:text-lg max-w-md" : "text-sm")
   }, agent.desc), /*#__PURE__*/React.createElement("p", {
     className: "mt-6 font-mono text-[11px] transition-colors duration-500 " + (active ? "text-[var(--accent)]" : "text-white/25 group-hover:text-white/45")
-  }, active ? "● simulando abajo" : "ver simulación →"));
+  }, active ? "● simulando abajo" : "ver simulación →"), agent.big && /*#__PURE__*/React.createElement("span", {
+    role: "button",
+    tabIndex: 0,
+    onClick: e => {
+      e.stopPropagation();
+      onGetMagnus();
+    },
+    onKeyDown: e => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.stopPropagation();
+        onGetMagnus();
+      }
+    },
+    className: "consigue-btn mt-7 inline-flex items-center gap-2.5 self-start rounded-full bg-[var(--accent)] px-6 py-3 text-sm font-medium text-black hover:brightness-110 transition-all cursor-pointer shadow-[0_0_30px_-6px_var(--accent-glow)]"
+  }, /*#__PURE__*/React.createElement(LIcon, {
+    name: "Download",
+    size: 16
+  }), "Consigue Magnus", /*#__PURE__*/React.createElement("span", {
+    className: "transition-transform duration-300"
+  }, "\u2192")));
 }
 function Ecosystem({
   active,
-  onSelect
+  onSelect,
+  onGetMagnus
 }) {
   return /*#__PURE__*/React.createElement("section", {
     id: "ecosistema",
@@ -1488,16 +2425,34 @@ function Ecosystem({
   }, /*#__PURE__*/React.createElement(Eyebrow, {
     icon: "LayoutGrid",
     className: "mb-4"
-  }, "01 \xB7 El ecosistema"), /*#__PURE__*/React.createElement("h2", {
-    className: "text-3xl md:text-5xl font-medium tracking-tight text-white mb-14 max-w-2xl"
-  }, "Cinco agentes. Una sola inteligencia."), /*#__PURE__*/React.createElement("div", {
+  }, "01 \xB7 El ecosistema"), /*#__PURE__*/React.createElement("div", {
+    "data-reveal": true,
+    className: "flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-14"
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "text-3xl md:text-5xl font-medium tracking-tight text-white max-w-2xl"
+  }, "Cinco agentes. Una sola inteligencia."), /*#__PURE__*/React.createElement("a", {
+    href: window.waLink ? window.waLink("Hola NOVA 👋 Quiero información sobre sus agentes de IA.") : "#empresas",
+    target: "_blank",
+    rel: "noopener noreferrer",
+    className: "group inline-flex items-center gap-2.5 self-start rounded-full border border-[var(--accent)]/30 bg-[var(--accent)]/5 px-5 py-2.5 text-sm text-[var(--accent)] hover:bg-[var(--accent)]/10 transition-colors whitespace-nowrap"
+  }, /*#__PURE__*/React.createElement(LIcon, {
+    name: "MessageCircle",
+    size: 15
+  }), "Consultar por WhatsApp", /*#__PURE__*/React.createElement("span", {
+    className: "transition-transform duration-300 group-hover:translate-x-1"
+  }, "\u2192"))), /*#__PURE__*/React.createElement("div", {
     className: "grid md:grid-cols-4 md:grid-rows-2 gap-4"
-  }, NOVA_AGENTS.map(a => /*#__PURE__*/React.createElement(AgentCard, {
+  }, NOVA_AGENTS.map((a, i) => /*#__PURE__*/React.createElement("div", {
     key: a.id,
+    "data-reveal": true,
+    "data-reveal-delay": i * 70 + "ms",
+    className: a.big ? "md:col-span-2 md:row-span-2" : ""
+  }, /*#__PURE__*/React.createElement(AgentCard, {
     agent: a,
     active: active === a.id,
-    onSelect: onSelect
-  }))));
+    onSelect: onSelect,
+    onGetMagnus: onGetMagnus
+  })))));
 }
 
 /* ---------- SIMULACIÓN ---------- */
@@ -1549,32 +2504,100 @@ function Simulator({
     key: active + "-det"
   }, /*#__PURE__*/React.createElement(AgentDetails, {
     agentId: active
-  })));
+  })), active !== "magnus" && window.InstallCTA && /*#__PURE__*/React.createElement(InstallCTA, {
+    agentId: active
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "mt-14 flex justify-center"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: backToGrid,
+    className: "group inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/[0.05] px-7 py-3.5 text-sm font-medium text-white/85 hover:text-white hover:border-[var(--accent)]/70 hover:bg-white/[0.08] hover:shadow-[0_0_25px_-5px_var(--accent-glow)] transition-all duration-300 outline-none"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-[var(--accent)] transition-transform duration-300 group-hover:-translate-x-1"
+  }, "\u2190"), "Volver al ecosistema")));
 }
 
 /* ---------- FOOTER ---------- */
 
 function Footer() {
+  const year = 2026;
   return /*#__PURE__*/React.createElement("footer", {
+    id: "contacto",
     "data-screen-label": "Footer",
-    className: "border-t border-white/[0.06] py-14 px-6"
+    className: "relative border-t border-white/[0.06] pt-20 pb-12 px-6 overflow-hidden"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6"
+    className: "footer-glow",
+    "aria-hidden": "true"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "relative max-w-6xl mx-auto"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center gap-3"
+    className: "grid md:grid-cols-[1.4fr_1fr_1fr] gap-12 mb-16"
+  }, /*#__PURE__*/React.createElement("div", {
+    "data-reveal": true
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-3 mb-5"
   }, /*#__PURE__*/React.createElement("img", {
     src: "assets/nova-n.png",
     alt: "",
-    className: "logo-n h-7 w-auto"
+    className: "logo-n h-8 w-auto"
   }), /*#__PURE__*/React.createElement("p", {
-    className: "font-mono text-sm tracking-[0.4em] text-white"
+    className: "font-mono text-base tracking-[0.4em] text-white"
   }, "NOVA", /*#__PURE__*/React.createElement("span", {
     className: "text-[var(--accent)]"
   }, "_"))), /*#__PURE__*/React.createElement("p", {
-    className: "font-mono text-[11px] text-white/30 tracking-wider text-center"
-  }, "©", " 2049 NOVA SYSTEMS \xB7 TRANSMITIDO DESDE EL FUTURO \xB7 TODOS LOS DERECHOS RESERVADOS"), /*#__PURE__*/React.createElement("p", {
+    className: "text-sm text-white/45 leading-relaxed max-w-xs mb-5"
+  }, "IA de frontera, al alcance del emprendedor colombiano. La misma tecnolog\xEDa de las grandes, para tu negocio."), /*#__PURE__*/React.createElement("a", {
+    href: waLink("Hola NOVA 👋 Quiero más información."),
+    target: "_blank",
+    rel: "noopener noreferrer",
+    className: "inline-flex items-center gap-2 rounded-full border border-[var(--accent)]/30 bg-[var(--accent)]/5 px-3.5 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--accent)]"
+  }, /*#__PURE__*/React.createElement(LIcon, {
+    name: "BadgeCheck",
+    size: 13
+  }), "Empresa verificada por Meta")), /*#__PURE__*/React.createElement("div", {
+    "data-reveal": true,
+    "data-reveal-delay": "80ms"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "font-mono text-[10px] tracking-[0.25em] uppercase text-white/35 mb-5"
+  }, "Contacto"), /*#__PURE__*/React.createElement("ul", {
+    className: "flex flex-col gap-3.5 text-sm"
+  }, /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("a", {
+    href: waLink("Hola NOVA 👋 Quiero más información."),
+    target: "_blank",
+    rel: "noopener noreferrer",
+    className: "inline-flex items-center gap-2.5 text-white/55 hover:text-[var(--accent)] transition-colors"
+  }, /*#__PURE__*/React.createElement(LIcon, {
+    name: "MessageCircle",
+    size: 15
+  }), WHATSAPP_DISPLAY)), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("a", {
+    href: "mailto:" + NOVA_EMAIL,
+    className: "inline-flex items-center gap-2.5 text-white/55 hover:text-[var(--accent)] transition-colors break-all"
+  }, /*#__PURE__*/React.createElement(LIcon, {
+    name: "Mail",
+    size: 15
+  }), NOVA_EMAIL)), /*#__PURE__*/React.createElement("li", {
+    className: "inline-flex items-center gap-2.5 text-white/55"
+  }, /*#__PURE__*/React.createElement(LIcon, {
+    name: "MapPin",
+    size: 15
+  }), "Barranquilla, Colombia"))), /*#__PURE__*/React.createElement("div", {
+    "data-reveal": true,
+    "data-reveal-delay": "160ms"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "font-mono text-[10px] tracking-[0.25em] uppercase text-white/35 mb-5"
+  }, "Explora"), /*#__PURE__*/React.createElement("ul", {
+    className: "flex flex-col gap-3.5 text-sm"
+  }, [["Agentes", "#ecosistema"], ["Descargar Magnus", "#descargar"], ["Planes", "#planes"], ["Para tu negocio", "#empresas"], ["Políticas y confianza", "#politicas"]].map(([l, h]) => /*#__PURE__*/React.createElement("li", {
+    key: h
+  }, /*#__PURE__*/React.createElement("a", {
+    href: h,
+    className: "text-white/55 hover:text-[var(--accent)] transition-colors"
+  }, l)))))), /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t border-white/[0.06]"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "font-mono text-[11px] text-white/30 tracking-wider text-center md:text-left"
+  }, "©", " ", year, " NOVA S.A.S. \xB7 Barranquilla, Colombia \xB7 Todos los derechos reservados"), /*#__PURE__*/React.createElement("p", {
     className: "font-mono text-[11px] text-white/30"
-  }, "v4.2.0-orbit")));
+  }, "\u201CLa IA propone, el sistema decide.\u201D"))));
 }
 
 /* ---------- APP ---------- */
@@ -1589,14 +2612,59 @@ function NovaApp() {
   const [active, setActive] = useAppState("magnus");
   const selectAgent = id => {
     setActive(id);
-    requestAnimationFrame(() => {
-      const el = document.getElementById("simulador");
-      if (el) window.scrollTo({
-        top: el.offsetTop - 56,
-        behavior: "smooth"
-      });
-    });
+    requestAnimationFrame(() => scrollToId("simulador", 56));
   };
+
+  // scroll-reveal: revela elementos [data-reveal] al entrar en viewport
+  useAppEffect(() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      document.querySelectorAll("[data-reveal]").forEach(el => el.classList.add("reveal-in"));
+      return;
+    }
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.transitionDelay = e.target.dataset.revealDelay || "0ms";
+          e.target.classList.add("reveal-in");
+          io.unobserve(e.target);
+        }
+      });
+    }, {
+      threshold: 0.12,
+      rootMargin: "0px 0px -7% 0px"
+    });
+    const run = () => document.querySelectorAll("[data-reveal]:not(.reveal-in)").forEach(el => io.observe(el));
+    const id = setTimeout(run, 60);
+    return () => {
+      clearTimeout(id);
+      io.disconnect();
+    };
+  }, [active]);
+
+  // animación del logo del hero ligada al scroll (rotación + flotación + desvanecido)
+  useAppEffect(() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const logo = document.getElementById("heroLogo");
+    if (!logo || reduce) return;
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const p = Math.min(1, y / 600);
+        logo.style.transform = "translateY(" + (y * 0.25).toFixed(1) + "px) rotate(" + (p * 12).toFixed(1) + "deg) scale(" + (1 - p * 0.15).toFixed(3) + ")";
+        logo.style.opacity = (1 - p * 0.7).toFixed(2);
+      });
+    };
+    window.addEventListener("scroll", onScroll, {
+      passive: true
+    });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
   const accentGlow = t.accent + Math.round(t.glow / 100 * 255).toString(16).padStart(2, "0");
   return /*#__PURE__*/React.createElement("div", {
     className: "min-h-screen text-white antialiased selection:bg-[var(--accent)] selection:text-black",
@@ -1627,16 +2695,35 @@ function NovaApp() {
     href: "#descargar",
     className: "hover:text-[var(--accent)] transition-colors"
   }, "Magnus"), /*#__PURE__*/React.createElement("a", {
-    href: "#planes",
-    className: "hover:text-[var(--accent)] transition-colors"
-  }, "Planes"), /*#__PURE__*/React.createElement("a", {
     href: "#empresas",
     className: "hover:text-[var(--accent)] transition-colors"
   }, "Empresas"))), /*#__PURE__*/React.createElement(Hero, null), /*#__PURE__*/React.createElement(Ecosystem, {
     active: active,
-    onSelect: selectAgent
+    onSelect: selectAgent,
+    onGetMagnus: () => scrollToId("planes", 56)
   }), /*#__PURE__*/React.createElement(Simulator, {
     active: active
-  }), /*#__PURE__*/React.createElement(TrustSection, null), /*#__PURE__*/React.createElement(DownloadSection, null), /*#__PURE__*/React.createElement(PricingSection, null), /*#__PURE__*/React.createElement(BusinessSection, null), /*#__PURE__*/React.createElement(AboutSection, null), /*#__PURE__*/React.createElement(Footer, null));
+  }), /*#__PURE__*/React.createElement(TrustSection, null), /*#__PURE__*/React.createElement(DownloadSection, null), /*#__PURE__*/React.createElement(PricingSection, null), /*#__PURE__*/React.createElement(BusinessSection, null), /*#__PURE__*/React.createElement(AboutSection, null), window.PoliciesSection && /*#__PURE__*/React.createElement(PoliciesSection, null), /*#__PURE__*/React.createElement(Footer, null), /*#__PURE__*/React.createElement(TweaksPanel, null, /*#__PURE__*/React.createElement(TweakSection, {
+    label: "Ne\xF3n"
+  }), /*#__PURE__*/React.createElement(TweakColor, {
+    label: "Acento",
+    value: t.accent,
+    options: ["#67e8f9", "#a78bfa", "#6ee7a0", "#fda4af"],
+    onChange: v => setTweak("accent", v)
+  }), /*#__PURE__*/React.createElement(TweakSlider, {
+    label: "Intensidad del glow",
+    value: t.glow,
+    min: 0,
+    max: 100,
+    unit: "%",
+    onChange: v => setTweak("glow", v)
+  }), /*#__PURE__*/React.createElement(TweakSection, {
+    label: "Fondo"
+  }), /*#__PURE__*/React.createElement(TweakColor, {
+    label: "Negro base",
+    value: t.bg,
+    options: ["#000000", "#050505", "#07070c"],
+    onChange: v => setTweak("bg", v)
+  })));
 }
 ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(NovaApp, null));

@@ -11,6 +11,7 @@
 <meta property="og:title" content="NOVA — Matriz de Agentes IA">
 <meta property="og:description" content="El ecosistema de IA que redefine el mañana. Agentes autónomos para tu negocio y tu vida.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://novalabscolombia-bit.github.io/">
 <meta property="og:image" content="assets/nova-n.png">
 
 <script src="https://cdn.tailwindcss.com"></script>
@@ -29,18 +30,21 @@
   };
 </script>
 <style>
-  html { scroll-behavior: smooth; background: #050505; }
-  body { margin: 0; font-family: "Space Grotesk", sans-serif; }
+  html { scroll-behavior: smooth; background: #050505; overflow-x: hidden; }
+  body { margin: 0; font-family: "Space Grotesk", sans-serif; overflow-x: hidden; }
 
+  /* ---- logo N (pieza 3D negra sobre fondo oscuro: halo de neón + realce) ---- */
   .logo-n {
     filter: brightness(1.9) contrast(1.05)
             drop-shadow(0 0 14px var(--accent-glow))
             drop-shadow(0 2px 30px var(--accent-glow));
   }
+  /* en viewports bajos, reducir el logo del hero para que todo respire */
   @media (max-height: 700px) {
     .hero-logo { width: 4.5rem !important; margin-bottom: 1.5rem !important; }
   }
 
+  /* ---- glows de fondo ---- */
   .hero-glow {
     position: absolute; inset: 0; pointer-events: none;
     opacity: var(--glow-opacity, 0.55);
@@ -60,6 +64,7 @@
     text-shadow: 0 0 40px var(--accent-glow);
   }
 
+  /* ---- CTA: brillo perimetral rotatorio ---- */
   @property --angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
   .glow-btn::before {
     content: ""; position: absolute; inset: -1px; border-radius: 9999px;
@@ -78,6 +83,7 @@
     .glow-btn::before, .glow-btn::after { animation: none; background: var(--accent); }
   }
 
+  /* ---- ecualizador de voz ---- */
   .eq-bar {
     transform-origin: center;
     animation: eq 1s ease-in-out infinite alternate;
@@ -89,6 +95,53 @@
   }
   @media (prefers-reduced-motion: reduce) { .eq-bar { animation: none; } }
 
+  /* ---- scroll reveal ---- */
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+    will-change: opacity, transform;
+  }
+  [data-reveal="scale"] { transform: translateY(30px) scale(0.97); }
+  [data-reveal].reveal-in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal] { opacity: 1 !important; transform: none !important; transition: none; }
+  }
+
+  /* ---- logo: flotación viva + halo ---- */
+  .hero-logo-wrap { display: inline-block; will-change: transform, opacity; }
+  .hero-logo-img { animation: logo-float 6.5s ease-in-out infinite; }
+  @keyframes logo-float {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50%      { transform: translateY(-12px) rotate(3deg); }
+  }
+  .logo-n.h-6, .logo-n.h-7, .logo-n.h-8 { transition: filter 0.3s, transform 0.3s; }
+  nav .logo-n:hover { transform: rotate(8deg) scale(1.08); }
+  @media (prefers-reduced-motion: reduce) { .hero-logo-img { animation: none; } }
+
+  /* ---- banner de novedades Magnus ---- */
+  .updates-banner { background: rgba(255,255,255,0.02); }
+  .updates-banner::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
+    background: linear-gradient(120deg, transparent, var(--accent), transparent);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity: 0.5; animation: banner-sheen 5s linear infinite; background-size: 250% 100%;
+  }
+  @keyframes banner-sheen { to { background-position: -250% 0; } }
+  .banner-spin { animation: banner-spin 9s linear infinite; }
+  @keyframes banner-spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .updates-banner::before, .banner-spin { animation: none; } }
+
+  /* ---- footer glow ---- */
+  .footer-glow {
+    position: absolute; inset: auto 0 0 0; height: 60%; pointer-events: none;
+    opacity: calc(var(--glow-opacity, 0.55) * 0.4);
+    background: radial-gradient(ellipse 50% 100% at 50% 100%, var(--accent-glow), transparent 70%);
+    filter: blur(20px);
+  }
+
+  /* ---- modales ---- */
   .animate-modal-fade { animation: modal-fade 0.25s ease both; }
   .animate-modal-pop { animation: modal-pop 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
   @keyframes modal-fade { from { opacity: 0; } to { opacity: 1; } }
@@ -97,6 +150,7 @@
     to   { opacity: 1; transform: none; }
   }
 
+  /* ---- flujo descendente de las líneas de la red ---- */
   .flow-line {
     stroke-dasharray: 5 16;
     stroke-linecap: round;
@@ -107,6 +161,7 @@
   }
   @media (prefers-reduced-motion: reduce) { .flow-line { animation: none; stroke-dasharray: none; } }
 
+  /* ---- nodos de la red (quiénes somos) ---- */
   .node-dot {
     opacity: 0.25;
     box-shadow: 0 0 8px var(--accent-glow);
@@ -118,15 +173,18 @@
   }
   @media (prefers-reduced-motion: reduce) { .node-dot { animation: none; } }
 
+  /* ---- caret de terminal ---- */
   .caret { animation: blink 1s steps(1) infinite; }
   @keyframes blink { 50% { opacity: 0; } }
 
+  /* ---- entrada del simulador al cambiar de agente ---- */
   .sim-enter { animation: sim-in 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); }
   @keyframes sim-in {
     from { opacity: 0; transform: translateY(18px) scale(0.985); filter: blur(6px); }
     to   { opacity: 1; transform: none; filter: none; }
   }
 
+  /* ---- entradas del hero ---- */
   @media (prefers-reduced-motion: no-preference) {
     .animate-fade-1, .animate-fade-2, .animate-fade-3 {
       animation: fade-up 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -143,7 +201,7 @@
 <body>
 <div id="root"></div>
 
-<!-- React de PRODUCCIÓN (sin Babel en runtime: el JSX ya viene compilado) -->
+<!-- React de PRODUCCIÓN (sin Babel en runtime: el JSX ya viene compilado en components.js) -->
 <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
