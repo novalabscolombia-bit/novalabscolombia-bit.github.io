@@ -1713,28 +1713,28 @@ const BIZ_BOTS = [{
   icon: "Store",
   sector: "Restaurantes",
   line: "Toma pedidos por WhatsApp 24/7, calcula domicilios y nunca pierde una venta.",
-  msg: "Hola NOVA 👋 Quiero alquilar AXON para mi restaurante. ¿Me cuentan precios y cómo empezar?"
+  msg: "¡Hola NOVA! Quiero alquilar AXON para mi restaurante. ¿Me cuentan precios y cómo empezar?"
 }, {
   id: "barber",
   name: "BARBER IA",
   icon: "Scissors",
   sector: "Barberías",
   line: "Llena la agenda, mata los no-shows y agenda turnos solo, sin que contestes un mensaje.",
-  msg: "Hola NOVA 👋 Quiero alquilar BARBER IA para mi barbería. ¿Me dan información?"
+  msg: "¡Hola NOVA! Quiero alquilar BARBER IA para mi barbería. ¿Me dan información?"
 }, {
   id: "cortex",
   name: "CORTEX",
   icon: "Headphones",
   sector: "Empresas",
   line: "Atención al cliente masiva 24/7 con respuestas basadas en tu documentación.",
-  msg: "Hola NOVA 👋 Me interesa CORTEX para la atención al cliente de mi empresa. ¿Cómo funciona?"
+  msg: "¡Hola NOVA! Me interesa CORTEX para la atención al cliente de mi empresa. ¿Cómo funciona?"
 }, {
   id: "mentor",
   name: "MENTOR IA",
   icon: "GraduationCap",
   sector: "Talento / RR.HH.",
   line: "Onboarding interno: resuelve las 10.000 preguntas repetitivas y libera a RR.HH.",
-  msg: "Hola NOVA 👋 Quiero MENTOR IA para el onboarding de mi equipo. ¿Me asesoran?"
+  msg: "¡Hola NOVA! Quiero MENTOR IA para el onboarding de mi equipo. ¿Me asesoran?"
 }];
 function BizCard({
   bot
@@ -1785,7 +1785,7 @@ function BusinessSection() {
   }, "Sin instalar nada"), "."), /*#__PURE__*/React.createElement("p", {
     className: "text-base md:text-lg text-white/45 leading-relaxed mb-8 max-w-md"
   }, "Cada bot vive en el WhatsApp de tu negocio y trabaja por ti desde el primer d\xEDa. Escr\xEDbenos y lo dejamos andando \u2014 precios, demo y configuraci\xF3n a tu medida."), /*#__PURE__*/React.createElement("a", {
-    href: waLink("Hola NOVA 👋 Quiero información para alquilar uno de sus bots para mi negocio."),
+    href: waLink("¡Hola NOVA! Quiero información para alquilar uno de sus bots para mi negocio."),
     target: "_blank",
     rel: "noopener noreferrer",
     className: "glow-btn group relative inline-flex rounded-full p-px overflow-hidden"
@@ -2345,7 +2345,7 @@ function Hero() {
   }, /*#__PURE__*/React.createElement("img", {
     src: "assets/nova-n.png",
     alt: "Logo NOVA",
-    className: "logo-n hero-logo-img w-48 md:w-64"
+    className: "logo-n hero-logo-img w-32 md:w-44"
   })), /*#__PURE__*/React.createElement("p", {
     className: "font-mono text-[11px] md:text-xs tracking-[0.5em] text-[var(--accent)] uppercase mb-8 animate-fade-1"
   }, "NOVA \xB7 Matriz de agentes"), /*#__PURE__*/React.createElement("h1", {
@@ -2431,7 +2431,7 @@ function Ecosystem({
   }, /*#__PURE__*/React.createElement("h2", {
     className: "text-3xl md:text-5xl font-medium tracking-tight text-white max-w-2xl"
   }, "Cinco agentes. Una sola inteligencia."), /*#__PURE__*/React.createElement("a", {
-    href: window.waLink ? window.waLink("Hola NOVA 👋 Quiero información sobre sus agentes de IA.") : "#empresas",
+    href: window.waLink ? window.waLink("¡Hola NOVA! Quiero información sobre sus agentes de IA.") : "#empresas",
     target: "_blank",
     rel: "noopener noreferrer",
     className: "group inline-flex items-center gap-2.5 self-start rounded-full border border-[var(--accent)]/30 bg-[var(--accent)]/5 px-5 py-2.5 text-sm text-[var(--accent)] hover:bg-[var(--accent)]/10 transition-colors whitespace-nowrap"
@@ -2546,7 +2546,7 @@ function Footer() {
   }, "_"))), /*#__PURE__*/React.createElement("p", {
     className: "text-sm text-white/45 leading-relaxed max-w-xs mb-5"
   }, "IA de frontera, al alcance del emprendedor colombiano. La misma tecnolog\xEDa de las grandes, para tu negocio."), /*#__PURE__*/React.createElement("a", {
-    href: waLink("Hola NOVA 👋 Quiero más información."),
+    href: waLink("¡Hola NOVA! Quiero más información."),
     target: "_blank",
     rel: "noopener noreferrer",
     className: "inline-flex items-center gap-2 rounded-full border border-[var(--accent)]/30 bg-[var(--accent)]/5 px-3.5 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--accent)]"
@@ -2561,7 +2561,7 @@ function Footer() {
   }, "Contacto"), /*#__PURE__*/React.createElement("ul", {
     className: "flex flex-col gap-3.5 text-sm"
   }, /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("a", {
-    href: waLink("Hola NOVA 👋 Quiero más información."),
+    href: waLink("¡Hola NOVA! Quiero más información."),
     target: "_blank",
     rel: "noopener noreferrer",
     className: "inline-flex items-center gap-2.5 text-white/55 hover:text-[var(--accent)] transition-colors"
