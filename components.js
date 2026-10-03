@@ -2593,9 +2593,13 @@ function Footer() {
     className: "text-white/55 hover:text-[var(--accent)] transition-colors"
   }, l)))))), /*#__PURE__*/React.createElement("div", {
     className: "flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t border-white/[0.06]"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-col gap-1.5 items-center md:items-start"
   }, /*#__PURE__*/React.createElement("p", {
     className: "font-mono text-[11px] text-white/30 tracking-wider text-center md:text-left"
   }, "©", " ", year, " NOVA S.A.S. \xB7 Barranquilla, Colombia \xB7 Todos los derechos reservados"), /*#__PURE__*/React.createElement("p", {
+    className: "font-mono text-[11px] text-white/30 tracking-wider text-center md:text-left"
+  }, "NOVA es una marca de Agenciadeia")), /*#__PURE__*/React.createElement("p", {
     className: "font-mono text-[11px] text-white/30"
   }, "\u201CLa IA propone, el sistema decide.\u201D"))));
 }
