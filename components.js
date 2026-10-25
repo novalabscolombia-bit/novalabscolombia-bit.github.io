@@ -1,4 +1,4 @@
-// NOVA — bundle compilado desde los .jsx de Claude Design (no editar a mano).
+// NITRA — bundle compilado desde los .jsx de Claude Design (no editar a mano).
 // Orden: tweaks-panel.jsx → nova-sim.jsx → nova-magnus.jsx → nova-pricing.jsx → nova-business.jsx → nova-policies.jsx → nova-details.jsx → nova-about.jsx → nova-app.jsx
 
 /* ===== tweaks-panel.jsx ===== */
@@ -666,7 +666,7 @@ Object.assign(window, {
 });
 
 /* ===== nova-sim.jsx ===== */
-// NOVA — Simuladores de agentes (MAGNUS / AXON / BARBER IA / CORTEX)
+// NITRA — Simuladores de agentes (MAGNUS / AXON / BARBER IA / CORTEX)
 const {
   useState,
   useEffect,
@@ -1116,7 +1116,7 @@ Object.assign(window, {
 });
 
 /* ===== nova-magnus.jsx ===== */
-// NOVA — MAGNUS: capacidades, descarga multiplataforma, planes y checkout
+// NITRA — MAGNUS: capacidades, descarga multiplataforma, planes y checkout
 const {
   useState: useMagState,
   useEffect: useMagEffect
@@ -1412,7 +1412,7 @@ Object.assign(window, {
 });
 
 /* ===== nova-pricing.jsx ===== */
-// NOVA — Planes de Magnus (B2C) + checkout con pasarelas de pago
+// NITRA — Planes de Magnus (B2C) + checkout con pasarelas de pago
 const {
   useState: usePlanState
 } = React;
@@ -1642,7 +1642,7 @@ Object.assign(window, {
 });
 
 /* ===== nova-business.jsx ===== */
-// NOVA — Para tu negocio: alquila los bots B2B vía WhatsApp
+// NITRA — Para tu negocio: alquila los bots B2B vía WhatsApp
 const {
   useState: useBizState
 } = React;
@@ -1713,28 +1713,28 @@ const BIZ_BOTS = [{
   icon: "Store",
   sector: "Restaurantes",
   line: "Toma pedidos por WhatsApp 24/7, calcula domicilios y nunca pierde una venta.",
-  msg: "¡Hola NOVA! Quiero alquilar AXON para mi restaurante. ¿Me cuentan precios y cómo empezar?"
+  msg: "¡Hola NITRA! Quiero alquilar AXON para mi restaurante. ¿Me cuentan precios y cómo empezar?"
 }, {
   id: "barber",
   name: "BARBER IA",
   icon: "Scissors",
   sector: "Barberías",
   line: "Llena la agenda, mata los no-shows y agenda turnos solo, sin que contestes un mensaje.",
-  msg: "¡Hola NOVA! Quiero alquilar BARBER IA para mi barbería. ¿Me dan información?"
+  msg: "¡Hola NITRA! Quiero alquilar BARBER IA para mi barbería. ¿Me dan información?"
 }, {
   id: "cortex",
   name: "CORTEX",
   icon: "Headphones",
   sector: "Empresas",
   line: "Atención al cliente masiva 24/7 con respuestas basadas en tu documentación.",
-  msg: "¡Hola NOVA! Me interesa CORTEX para la atención al cliente de mi empresa. ¿Cómo funciona?"
+  msg: "¡Hola NITRA! Me interesa CORTEX para la atención al cliente de mi empresa. ¿Cómo funciona?"
 }, {
   id: "mentor",
   name: "MENTOR IA",
   icon: "GraduationCap",
   sector: "Talento / RR.HH.",
   line: "Onboarding interno: resuelve las 10.000 preguntas repetitivas y libera a RR.HH.",
-  msg: "¡Hola NOVA! Quiero MENTOR IA para el onboarding de mi equipo. ¿Me asesoran?"
+  msg: "¡Hola NITRA! Quiero MENTOR IA para el onboarding de mi equipo. ¿Me asesoran?"
 }];
 function BizCard({
   bot
@@ -1785,7 +1785,7 @@ function BusinessSection() {
   }, "Sin instalar nada"), "."), /*#__PURE__*/React.createElement("p", {
     className: "text-base md:text-lg text-white/45 leading-relaxed mb-8 max-w-md"
   }, "Cada bot vive en el WhatsApp de tu negocio y trabaja por ti desde el primer d\xEDa. Escr\xEDbenos y lo dejamos andando \u2014 precios, demo y configuraci\xF3n a tu medida."), /*#__PURE__*/React.createElement("a", {
-    href: waLink("¡Hola NOVA! Quiero información para alquilar uno de sus bots para mi negocio."),
+    href: waLink("¡Hola NITRA! Quiero información para alquilar uno de sus bots para mi negocio."),
     target: "_blank",
     rel: "noopener noreferrer",
     className: "glow-btn group relative inline-flex rounded-full p-px overflow-hidden"
@@ -1794,7 +1794,7 @@ function BusinessSection() {
   }, /*#__PURE__*/React.createElement(LIcon, {
     name: "MessageCircle",
     size: 16
-  }), "Hablar con NOVA por WhatsApp")), /*#__PURE__*/React.createElement("p", {
+  }), "Hablar con NITRA por WhatsApp")), /*#__PURE__*/React.createElement("p", {
     className: "mt-5 font-mono text-[11px] text-white/30 leading-relaxed max-w-xs"
   }, "Respuesta en segundos \xB7 planes mensuales para uno o varios locales.")), /*#__PURE__*/React.createElement("div", {
     className: "grid sm:grid-cols-2 gap-4"
@@ -1814,7 +1814,7 @@ Object.assign(window, {
 });
 
 /* ===== nova-policies.jsx ===== */
-// NOVA — Políticas públicas, confianza y respaldo
+// NITRA — Políticas públicas, confianza y respaldo
 const {
   useState: usePolState
 } = React;
@@ -1838,11 +1838,11 @@ const POLICIES = [{
 }, {
   icon: "Ban",
   title: "Uso aceptable",
-  body: "Nuestros servicios deben usarse de forma lícita y ética. Está prohibido: actividades ilícitas, spam o mensajería masiva sin consentimiento, suplantación o acoso, engaño a usuarios finales, recolección de datos sin autorización e intentos de vulnerar la seguridad de NOVA."
+  body: "Nuestros servicios deben usarse de forma lícita y ética. Está prohibido: actividades ilícitas, spam o mensajería masiva sin consentimiento, suplantación o acoso, engaño a usuarios finales, recolección de datos sin autorización e intentos de vulnerar la seguridad de NITRA."
 }, {
   icon: "BadgeCheck",
   title: "Empresa verificada por Meta",
-  body: "NOVA opera con una cuenta de WhatsApp Business verificada por Meta y la API oficial (Meta Cloud API). Cuando conversas con NOVA por WhatsApp lo haces con una empresa legítima y verificada en la plataforma oficial — no automatizaciones no autorizadas."
+  body: "NITRA opera con una cuenta de WhatsApp Business verificada por Meta y la API oficial (Meta Cloud API). Cuando conversas con NITRA por WhatsApp lo haces con una empresa legítima y verificada en la plataforma oficial — no automatizaciones no autorizadas."
 }];
 function PolicyRow({
   icon,
@@ -1920,14 +1920,14 @@ function PoliciesSection() {
     body: p.body
   })))), /*#__PURE__*/React.createElement("p", {
     className: "mt-10 text-center font-mono text-[11px] text-white/30 leading-relaxed max-w-2xl mx-auto"
-  }, "Gu\xEDa p\xFAblica de principios de NOVA S.A.S. \xB7 Barranquilla, Colombia \xB7 vigente desde junio de 2026. Los documentos legales vinculantes la complementan."));
+  }, "Gu\xEDa p\xFAblica de principios de NITRA S.A.S. \xB7 Barranquilla, Colombia \xB7 vigente desde junio de 2026. Los documentos legales vinculantes la complementan."));
 }
 Object.assign(window, {
   PoliciesSection
 });
 
 /* ===== nova-details.jsx ===== */
-// NOVA — Contenido detallado por agente: Impacto Real + Bajo el Capó (acordeones) + Confianza/FAQ
+// NITRA — Contenido detallado por agente: Impacto Real + Bajo el Capó (acordeones) + Confianza/FAQ
 const {
   useState: useDetState
 } = React;
@@ -2066,7 +2066,7 @@ function TrustSection() {
     className: "text-glow"
   }, "sistema"), " decide.\xBB"), /*#__PURE__*/React.createElement("p", {
     className: "text-white/50 leading-relaxed max-w-md"
-  }, "En todo el ecosistema NOVA, la conversaci\xF3n es flexible pero los datos son inflexibles: la IA nunca escribe sola en agendas ni inventarios. Un motor de reglas revalida cada operaci\xF3n en el instante de ejecutarla. Cero errores de agenda. Cero inventos.")), /*#__PURE__*/React.createElement("div", {
+  }, "En todo el ecosistema NITRA, la conversaci\xF3n es flexible pero los datos son inflexibles: la IA nunca escribe sola en agendas ni inventarios. Un motor de reglas revalida cada operaci\xF3n en el instante de ejecutarla. Cero errores de agenda. Cero inventos.")), /*#__PURE__*/React.createElement("div", {
     className: "flex flex-col gap-3"
   }, /*#__PURE__*/React.createElement(Eyebrow, {
     icon: "HelpCircle",
@@ -2084,11 +2084,11 @@ Object.assign(window, {
 });
 
 /* ===== nova-about.jsx ===== */
-// NOVA — Sección "Quiénes somos": identidad, manifiesto, líneas de impacto, principios, roadmap, equipo
+// NITRA — Sección "Quiénes somos": identidad, manifiesto, líneas de impacto, principios, roadmap, equipo
 const MANIFESTO = [["Descentralizamos la tecnología de frontera", "La inteligencia artificial está reconfigurando las industrias, pero el acceso a herramientas de última generación no puede quedarse atrapado en las grandes corporaciones ni centralizado en las capitales. Trabajamos para que cualquier comerciante, creador de marca y empresa en crecimiento, desde cualquier rincón de Colombia, tenga exactamente el mismo poder de innovación tecnológica para escalar sus operaciones."], ["Innovación medida en resultados comerciales", "No construimos tecnología por seguir una tendencia ni decorar una interfaz. Diseñamos sistemas con un propósito operativo claro: resolver los cuellos de botella cotidianos del tejido empresarial colombiano, garantizando que cada línea de código se traduzca en ahorro de tiempo, optimización de recursos y aumento de ventas tangibles."], ["Automatizar para potenciar el talento", "Entendemos la IA como una palanca de libertad operativa, no como un sustituto del valor humano. Cuando un agente inteligente se encarga de la ejecución básica, el talento nacional recupera el tiempo para hacer lo que mejor sabe hacer: crear, pensar la estrategia y expandir el negocio."], ["Aliados del tejido empresarial nacional", "Conocemos la diversidad, los desafíos y la velocidad a la que se mueve el comercio en las distintas regiones del país. No operamos como un proveedor de software distante; nos integramos a la realidad de nuestros clientes para acelerar la transformación digital desde la base de la economía colombiana."]];
 const IMPACT_LINES = [["01", "Ingeniería de Procesos y Automatización", "Asistentes virtuales avanzados y flujos autónomos que integran canales clave como WhatsApp. Transformamos infraestructuras de atención tradicionales en sistemas capaces de vender, agendar y resolver solicitudes complejas las 24 horas del día."], ["02", "Consultoría en Madurez Digital", "Analizamos la estructura operativa y financiera de tu negocio para identificar oportunidades reales donde la IA puede reducir costos. Trazamos una hoja de ruta personalizada y medimos el impacto financiero real."], ["03", "Optimización Comercial con IA", "Potenciamos marketing, captación y ventas con modelos de lenguaje de última generación: flujos de contenido inteligentes, gestión de audiencias y automatización de campañas basados en datos reales de comportamiento."], ["04", "Células de Formación y Adopción", "La tecnología solo es útil si los equipos saben dominarla. Espacios de aprendizaje interactivos, talleres prácticos y bootcamps intensivos para adoptar metodologías ágiles apoyadas en IA, sin tecnicismos innecesarios."]];
 const PRINCIPLES = [["Democratización real", "Si una solución tecnológica no es escalable y accesible para una Pyme colombiana, no es la solución correcta para nosotros."], ["Eficiencia empírica", "Buscamos la solución más directa y funcional. No diseñamos sistemas complejos si un flujo automatizado simple resuelve el problema de forma óptima."], ["Ética de datos y confianza", "Entornos seguros y transparentes que protegen la información comercial de las empresas y la privacidad de sus usuarios bajo los más altos estándares."], ["Acompañamiento en el terreno", "Monitoreamos y calibramos cada herramienta en escenarios reales de operación para asegurar que cumpla los objetivos de negocio trazados."]];
-const ROADMAP = [["Horizonte actual", "Consolidar la formación técnica de los primeros 500 emprendedores e implementar herramientas de automatización comercial en 100 empresas a nivel nacional."], ["Estrategia país", "Convertir el modelo de NOVA en el principal referente de adopción digital para las Pymes de Colombia, impactando a más de 1.000 unidades de negocio con metodologías de optimización a la medida."], ["Visión de frontera", "Desarrollar un ecosistema modular de software e IA nativo, diseñado específicamente para acelerar la competitividad y la productividad empresarial en la región."]];
+const ROADMAP = [["Horizonte actual", "Consolidar la formación técnica de los primeros 500 emprendedores e implementar herramientas de automatización comercial en 100 empresas a nivel nacional."], ["Estrategia país", "Convertir el modelo de NITRA en el principal referente de adopción digital para las Pymes de Colombia, impactando a más de 1.000 unidades de negocio con metodologías de optimización a la medida."], ["Visión de frontera", "Desarrollar un ecosistema modular de software e IA nativo, diseñado específicamente para acelerar la competitividad y la productividad empresarial en la región."]];
 const FOUNDERS = [["EA", "Esteban Arévalo Molina", "Co-Fundador"], ["JA", "Jesús Arévalo Molina", "Co-Fundador"]];
 function NodeField() {
   // red abstracta de nodos con flujo descendente: líneas en coordenadas %
@@ -2181,7 +2181,7 @@ function AboutSection() {
     className: "text-glow"
   }, "mueven a Colombia"), "."), /*#__PURE__*/React.createElement("p", {
     className: "mt-8 max-w-2xl text-base md:text-lg text-white/45 leading-relaxed"
-  }, "NOVA es una agencia de adopci\xF3n tecnol\xF3gica y automatizaci\xF3n avanzada. Desarrollamos e implementamos herramientas pr\xE1cticas de inteligencia artificial para que las empresas y emprendedores de todo el pa\xEDs multipliquen su productividad, optimicen sus costos fijos y compitan sin desventajas en la econom\xEDa digital global."), /*#__PURE__*/React.createElement("p", {
+  }, "NITRA es una agencia de adopci\xF3n tecnol\xF3gica y automatizaci\xF3n avanzada. Desarrollamos e implementamos herramientas pr\xE1cticas de inteligencia artificial para que las empresas y emprendedores de todo el pa\xEDs multipliquen su productividad, optimicen sus costos fijos y compitan sin desventajas en la econom\xEDa digital global."), /*#__PURE__*/React.createElement("p", {
     className: "mt-10"
   }, /*#__PURE__*/React.createElement("a", {
     href: "#simulador",
@@ -2281,7 +2281,7 @@ Object.assign(window, {
 });
 
 /* ===== nova-app.jsx ===== */
-// NOVA — Hero, Bento Grid, Footer, App
+// NITRA — Hero, Bento Grid, Footer, App
 const {
   useState: useAppState,
   useEffect: useAppEffect,
@@ -2344,11 +2344,11 @@ function Hero() {
     className: "hero-logo-wrap mb-10 animate-fade-1"
   }, /*#__PURE__*/React.createElement("img", {
     src: "assets/nova-n.png",
-    alt: "Logo NOVA",
+    alt: "Logo NITRA",
     className: "logo-n hero-logo-img w-32 md:w-44"
   })), /*#__PURE__*/React.createElement("p", {
     className: "font-mono text-[11px] md:text-xs tracking-[0.5em] text-[var(--accent)] uppercase mb-8 animate-fade-1"
-  }, "NOVA \xB7 Matriz de agentes"), /*#__PURE__*/React.createElement("h1", {
+  }, "NITRA \xB7 Matriz de agentes"), /*#__PURE__*/React.createElement("h1", {
     className: "max-w-5xl text-4xl md:text-7xl font-medium leading-[1.05] tracking-tight text-white animate-fade-2"
   }, "El ecosistema de Inteligencia Artificial que", " ", /*#__PURE__*/React.createElement("span", {
     className: "text-glow"
@@ -2431,7 +2431,7 @@ function Ecosystem({
   }, /*#__PURE__*/React.createElement("h2", {
     className: "text-3xl md:text-5xl font-medium tracking-tight text-white max-w-2xl"
   }, "Cinco agentes. Una sola inteligencia."), /*#__PURE__*/React.createElement("a", {
-    href: window.waLink ? window.waLink("¡Hola NOVA! Quiero información sobre sus agentes de IA.") : "#empresas",
+    href: window.waLink ? window.waLink("¡Hola NITRA! Quiero información sobre sus agentes de IA.") : "#empresas",
     target: "_blank",
     rel: "noopener noreferrer",
     className: "group inline-flex items-center gap-2.5 self-start rounded-full border border-[var(--accent)]/30 bg-[var(--accent)]/5 px-5 py-2.5 text-sm text-[var(--accent)] hover:bg-[var(--accent)]/10 transition-colors whitespace-nowrap"
@@ -2541,12 +2541,12 @@ function Footer() {
     className: "logo-n h-8 w-auto"
   }), /*#__PURE__*/React.createElement("p", {
     className: "font-mono text-base tracking-[0.4em] text-white"
-  }, "NOVA", /*#__PURE__*/React.createElement("span", {
+  }, "NITRA", /*#__PURE__*/React.createElement("span", {
     className: "text-[var(--accent)]"
   }, "_"))), /*#__PURE__*/React.createElement("p", {
     className: "text-sm text-white/45 leading-relaxed max-w-xs mb-5"
   }, "IA de frontera, al alcance del emprendedor colombiano. La misma tecnolog\xEDa de las grandes, para tu negocio."), /*#__PURE__*/React.createElement("a", {
-    href: waLink("¡Hola NOVA! Quiero más información."),
+    href: waLink("¡Hola NITRA! Quiero más información."),
     target: "_blank",
     rel: "noopener noreferrer",
     className: "inline-flex items-center gap-2 rounded-full border border-[var(--accent)]/30 bg-[var(--accent)]/5 px-3.5 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--accent)]"
@@ -2561,7 +2561,7 @@ function Footer() {
   }, "Contacto"), /*#__PURE__*/React.createElement("ul", {
     className: "flex flex-col gap-3.5 text-sm"
   }, /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("a", {
-    href: waLink("¡Hola NOVA! Quiero más información."),
+    href: waLink("¡Hola NITRA! Quiero más información."),
     target: "_blank",
     rel: "noopener noreferrer",
     className: "inline-flex items-center gap-2.5 text-white/55 hover:text-[var(--accent)] transition-colors"
@@ -2597,9 +2597,9 @@ function Footer() {
     className: "flex flex-col gap-1.5 items-center md:items-start"
   }, /*#__PURE__*/React.createElement("p", {
     className: "font-mono text-[11px] text-white/30 tracking-wider text-center md:text-left"
-  }, "©", " ", year, " NOVA S.A.S. \xB7 Barranquilla, Colombia \xB7 Todos los derechos reservados"), /*#__PURE__*/React.createElement("p", {
+  }, "©", " ", year, " NITRA S.A.S. \xB7 Barranquilla, Colombia \xB7 Todos los derechos reservados"), /*#__PURE__*/React.createElement("p", {
     className: "font-mono text-[11px] text-white/30 tracking-wider text-center md:text-left"
-  }, "NOVA es una marca de Agenciadeia")), /*#__PURE__*/React.createElement("p", {
+  }, "NITRA es una marca de Agenciadeia")), /*#__PURE__*/React.createElement("p", {
     className: "font-mono text-[11px] text-white/30"
   }, "\u201CLa IA propone, el sistema decide.\u201D"))));
 }
@@ -2688,7 +2688,7 @@ function NovaApp() {
     className: "logo-n h-6 w-auto"
   }), /*#__PURE__*/React.createElement("p", {
     className: "font-mono text-sm tracking-[0.4em]"
-  }, "NOVA", /*#__PURE__*/React.createElement("span", {
+  }, "NITRA", /*#__PURE__*/React.createElement("span", {
     className: "text-[var(--accent)]"
   }, "_"))), /*#__PURE__*/React.createElement("div", {
     className: "hidden md:flex items-center gap-7 font-mono text-[11px] tracking-[0.15em] uppercase text-white/45"
