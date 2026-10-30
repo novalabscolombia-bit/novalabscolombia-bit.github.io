@@ -3,212 +3,366 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NITRA — Matriz de Agentes IA</title>
-<meta name="description" content="NITRA — Ecosistema de agentes de inteligencia artificial para los negocios de Colombia. MAGNUS, AXON, BARBER IA, CORTEX y MENTOR IA.">
-<meta name="theme-color" content="#050505">
+<title>NITRA — Asistentes de IA para WhatsApp · AXON para restaurantes</title>
+<meta name="description" content="NITRA crea asistentes de inteligencia artificial que atienden tu WhatsApp. AXON contesta, toma pedidos y coordina los domicilios de tu restaurante 24/7. Hecho en Barranquilla, Colombia.">
+<meta name="theme-color" content="#F3F1EE">
+<link rel="canonical" href="https://nitralabs.github.io/">
 
-<!-- Open Graph -->
-<meta property="og:title" content="NITRA — Matriz de Agentes IA">
-<meta property="og:description" content="El ecosistema de IA que redefine el mañana. Agentes autónomos para tu negocio y tu vida.">
+<meta property="og:title" content="NITRA — Asistentes de IA que atienden tu WhatsApp">
+<meta property="og:description" content="AXON contesta, toma pedidos y coordina los domicilios de tu restaurante 24/7. Mira los tutoriales.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://novalabscolombia-bit.github.io/">
-<meta property="og:image" content="assets/nova-n.png">
+<meta property="og:url" content="https://nitralabs.github.io/">
+<meta property="og:image" content="https://nitralabs.github.io/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="es_CO">
+<meta name="twitter:card" content="summary_large_image">
 
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="assets/nova-n.png">
-<script>
-  tailwind.config = {
-    theme: {
-      fontFamily: {
-        sans: ['"Space Grotesk"', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'monospace'],
-      },
-    },
-  };
-</script>
-<style>
-  html { scroll-behavior: smooth; background: #050505; overflow-x: hidden; }
-  body { margin: 0; font-family: "Space Grotesk", sans-serif; overflow-x: hidden; }
-
-  /* ---- logo N (pieza 3D negra sobre fondo oscuro: halo de neón + realce) ---- */
-  .logo-n {
-    filter: brightness(1.9) contrast(1.05)
-            drop-shadow(0 0 14px var(--accent-glow))
-            drop-shadow(0 2px 30px var(--accent-glow));
-  }
-  /* en viewports bajos, reducir el logo del hero para que todo respire */
-  @media (max-height: 700px) {
-    .hero-logo { width: 4.5rem !important; margin-bottom: 1.5rem !important; }
-  }
-
-  /* ---- glows de fondo ---- */
-  .hero-glow {
-    position: absolute; inset: 0; pointer-events: none;
-    opacity: var(--glow-opacity, 0.55);
-    background:
-      radial-gradient(ellipse 55% 38% at 50% -8%, var(--accent-glow), transparent 70%),
-      radial-gradient(ellipse 30% 22% at 82% 78%, var(--accent-glow), transparent 70%);
-    filter: blur(8px);
-  }
-  .sim-glow {
-    position: absolute; inset: -10% -20%; pointer-events: none; z-index: -1;
-    opacity: calc(var(--glow-opacity, 0.55) * 0.5);
-    background: radial-gradient(ellipse 45% 45% at 50% 55%, var(--accent-glow), transparent 70%);
-    filter: blur(30px);
-  }
-  .text-glow {
-    color: var(--accent);
-    text-shadow: 0 0 40px var(--accent-glow);
-  }
-
-  /* ---- CTA: brillo perimetral rotatorio ---- */
-  @property --angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
-  .glow-btn::before {
-    content: ""; position: absolute; inset: -1px; border-radius: 9999px;
-    background: conic-gradient(from var(--angle), transparent 10%, var(--accent) 25%, transparent 40%, transparent 60%, var(--accent) 75%, transparent 90%);
-    animation: spin-angle 3.2s linear infinite;
-  }
-  .glow-btn::after {
-    content: ""; position: absolute; inset: -1px; border-radius: 9999px; z-index: -1;
-    background: conic-gradient(from var(--angle), transparent 10%, var(--accent) 25%, transparent 40%, transparent 60%, var(--accent) 75%, transparent 90%);
-    animation: spin-angle 3.2s linear infinite;
-    filter: blur(14px); opacity: var(--glow-opacity, 0.55);
-  }
-  .glow-btn:hover::before, .glow-btn:hover::after { animation-duration: 1.4s; }
-  @keyframes spin-angle { to { --angle: 360deg; } }
-  @media (prefers-reduced-motion: reduce) {
-    .glow-btn::before, .glow-btn::after { animation: none; background: var(--accent); }
-  }
-
-  /* ---- ecualizador de voz ---- */
-  .eq-bar {
-    transform-origin: center;
-    animation: eq 1s ease-in-out infinite alternate;
-    box-shadow: 0 0 12px var(--accent-glow);
-  }
-  @keyframes eq {
-    from { transform: scaleY(0.25); opacity: 0.5; }
-    to   { transform: scaleY(1);    opacity: 1; }
-  }
-  @media (prefers-reduced-motion: reduce) { .eq-bar { animation: none; } }
-
-  /* ---- scroll reveal ---- */
-  [data-reveal] {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
-    will-change: opacity, transform;
-  }
-  [data-reveal="scale"] { transform: translateY(30px) scale(0.97); }
-  [data-reveal].reveal-in { opacity: 1; transform: none; }
-  @media (prefers-reduced-motion: reduce) {
-    [data-reveal] { opacity: 1 !important; transform: none !important; transition: none; }
-  }
-
-  /* ---- logo: flotación viva + halo ---- */
-  .hero-logo-wrap { display: inline-block; will-change: transform, opacity; }
-  .hero-logo-img { animation: logo-float 6.5s ease-in-out infinite; }
-  @keyframes logo-float {
-    0%, 100% { transform: translateY(0) rotate(-3deg); }
-    50%      { transform: translateY(-12px) rotate(3deg); }
-  }
-  .logo-n.h-6, .logo-n.h-7, .logo-n.h-8 { transition: filter 0.3s, transform 0.3s; }
-  nav .logo-n:hover { transform: rotate(8deg) scale(1.08); }
-  @media (prefers-reduced-motion: reduce) { .hero-logo-img { animation: none; } }
-
-  /* ---- banner de novedades Magnus ---- */
-  .updates-banner { background: rgba(255,255,255,0.02); }
-  .updates-banner::before {
-    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
-    background: linear-gradient(120deg, transparent, var(--accent), transparent);
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor; mask-composite: exclude;
-    opacity: 0.5; animation: banner-sheen 5s linear infinite; background-size: 250% 100%;
-  }
-  @keyframes banner-sheen { to { background-position: -250% 0; } }
-  .banner-spin { animation: banner-spin 9s linear infinite; }
-  @keyframes banner-spin { to { transform: rotate(360deg); } }
-  @media (prefers-reduced-motion: reduce) { .updates-banner::before, .banner-spin { animation: none; } }
-
-  /* ---- footer glow ---- */
-  .footer-glow {
-    position: absolute; inset: auto 0 0 0; height: 60%; pointer-events: none;
-    opacity: calc(var(--glow-opacity, 0.55) * 0.4);
-    background: radial-gradient(ellipse 50% 100% at 50% 100%, var(--accent-glow), transparent 70%);
-    filter: blur(20px);
-  }
-
-  /* ---- modales ---- */
-  .animate-modal-fade { animation: modal-fade 0.25s ease both; }
-  .animate-modal-pop { animation: modal-pop 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-  @keyframes modal-fade { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes modal-pop {
-    from { opacity: 0; transform: translateY(16px) scale(0.97); }
-    to   { opacity: 1; transform: none; }
-  }
-
-  /* ---- flujo descendente de las líneas de la red ---- */
-  .flow-line {
-    stroke-dasharray: 5 16;
-    stroke-linecap: round;
-    animation: line-flow linear infinite;
-  }
-  @keyframes line-flow {
-    to { stroke-dashoffset: -210; }
-  }
-  @media (prefers-reduced-motion: reduce) { .flow-line { animation: none; stroke-dasharray: none; } }
-
-  /* ---- nodos de la red (quiénes somos) ---- */
-  .node-dot {
-    opacity: 0.25;
-    box-shadow: 0 0 8px var(--accent-glow);
-    animation: node-pulse 4s ease-in-out infinite;
-  }
-  @keyframes node-pulse {
-    0%, 100% { opacity: 0.18; }
-    50% { opacity: 0.55; }
-  }
-  @media (prefers-reduced-motion: reduce) { .node-dot { animation: none; } }
-
-  /* ---- caret de terminal ---- */
-  .caret { animation: blink 1s steps(1) infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
-
-  /* ---- entrada del simulador al cambiar de agente ---- */
-  .sim-enter { animation: sim-in 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); }
-  @keyframes sim-in {
-    from { opacity: 0; transform: translateY(18px) scale(0.985); filter: blur(6px); }
-    to   { opacity: 1; transform: none; filter: none; }
-  }
-
-  /* ---- entradas del hero ---- */
-  @media (prefers-reduced-motion: no-preference) {
-    .animate-fade-1, .animate-fade-2, .animate-fade-3 {
-      animation: fade-up 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-    }
-    .animate-fade-2 { animation-delay: 0.15s; }
-    .animate-fade-3 { animation-delay: 0.35s; }
-  }
-  @keyframes fade-up {
-    from { opacity: 0; transform: translateY(22px); }
-    to   { opacity: 1; transform: none; }
-  }
-</style>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div id="root"></div>
-<!-- Para quien lee la página sin ejecutar JS (revisores y buscadores): la marca y su dueño legal. -->
-<noscript><p>NITRA — Matriz de Agentes IA · NITRA es una marca de Agenciadeia · Barranquilla, Colombia</p></noscript>
+<canvas class="red" id="red" aria-hidden="true"></canvas>
 
-<!-- React de PRODUCCIÓN (sin Babel en runtime: el JSX ya viene compilado en components.js) -->
-<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<!-- Íconos (trazos simples de 24×24) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.7-5A8.5 8.5 0 1 1 21 11.5z"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 10.5v1a7 7 0 0 0 14 0v-1M12 18.5v3"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-7.2 7-12.8a7 7 0 0 0-14 0C5 14.8 12 22 12 22z"/><circle cx="12" cy="9.2" r="2.6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M4.5 12.5l5 5L19.5 7"/></symbol>
+    <symbol id="i-recibo" viewBox="0 0 24 24"><path d="M6 2.5h12v19l-3-2-3 2-3-2-3 2zM9 7.5h6M9 11h6M9 14.5h4"/></symbol>
+    <symbol id="i-moto" viewBox="0 0 24 24"><circle cx="5.5" cy="17.5" r="3"/><circle cx="18.5" cy="17.5" r="3"/><path d="M8.5 17.5h6l2.5-6h-4.5M15 6h2.5l1 5.5M5.5 14.5l3-3.5h4"/></symbol>
+    <symbol id="i-campana" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></symbol>
+    <symbol id="i-grafica" viewBox="0 0 24 24"><path d="M3 3v18h18M7 15l4-4 3 3 5-6"/></symbol>
+    <symbol id="i-chispa" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
+    <symbol id="i-ojo" viewBox="0 0 24 24"><path d="M2 12s3.8-7 10-7 10 7 10 7-3.8 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-escudo" viewBox="0 0 24 24"><path d="M12 21.5s8-3.8 8-10V5.2L12 2.5 4 5.2v6.3c0 6.2 8 10 8 10z"/></symbol>
+    <symbol id="i-candado" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-precio" viewBox="0 0 24 24"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/></symbol>
+    <symbol id="i-herramienta" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9l-3.8 3.8z"/></symbol>
+    <symbol id="i-tienda" viewBox="0 0 24 24"><path d="M4 10v10h16V10M3 10l2-6h14l2 6M3 10c0 1.7 1.3 3 3 3s3-1.3 3-3c0 1.7 1.3 3 3 3s3-1.3 3-3c0 1.7 1.3 3 3 3s3-1.3 3-3M10 20v-5h4v5"/></symbol>
+    <symbol id="i-tijeras" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12"/></symbol>
+    <symbol id="i-audifonos" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></symbol>
+    <symbol id="i-birrete" viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5zM6 12v5c3 2 9 2 12 0v-5"/></symbol>
+    <symbol id="i-laptop" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="11" rx="2"/><path d="M2 20h20"/></symbol>
+    <symbol id="i-flecha" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-enlace" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></symbol>
+    <symbol id="i-cerrar" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-insta" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-correo" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
+    <symbol id="i-reloj" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></symbol>
+    <symbol id="i-meta" viewBox="0 0 24 24"><path d="M12 21.5s8-3.8 8-10V5.2L12 2.5 4 5.2v6.3c0 6.2 8 10 8 10z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></symbol>
+    <symbol id="i-ley" viewBox="0 0 24 24"><path d="M12 3v18M6 21h12M4 7h16M7 7l-3 7a3 3 0 0 0 6 0zM17 7l-3 7a3 3 0 0 0 6 0z"/></symbol>
+    <symbol id="i-tienda" viewBox="0 0 24 24"><path d="M3.5 9.5L5 4h14l1.5 5.5"/><path d="M3.5 9.5a2.8 2.8 0 0 0 5.6 0 2.8 2.8 0 0 0 5.8 0 2.8 2.8 0 0 0 5.6 0"/><path d="M5 12.5V20h14v-7.5"/><path d="M10 20v-4.5h4V20"/></symbol>
+    <symbol id="i-persona" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  </defs>
+</svg>
 
-<!-- Componentes NITRA ya compilados a JS plano -->
-<script src="components.js" defer></script>
+<!-- ═══════════ MENÚ ═══════════ -->
+<header class="menu" id="menu">
+  <div class="wrap menu-in">
+    <a class="marca" href="#inicio" aria-label="NITRA, inicio">
+      <img src="assets/n-linea.png" alt="" width="40" height="28"><span>NITRA</span>
+    </a>
+    <nav class="links" id="links" aria-label="Secciones">
+      <a href="#axon">AXON</a>
+      <a href="#tutoriales">Tutoriales</a>
+      <a href="#proximamente">Próximamente</a>
+      <a href="#nosotros">Nosotros</a>
+      <a class="btn btn-negro btn-sm" href="https://wa.me/573248874403" data-wa="Hola NITRA, quiero saber más de AXON para mi restaurante.">Escríbenos</a>
+    </nav>
+    <button class="hamburguesa" id="hamburguesa" aria-label="Abrir el menú" aria-expanded="false" aria-controls="links">
+      <svg class="ic"><use href="#i-menu"/></svg>
+    </button>
+  </div>
+  <span class="progreso" id="progreso" aria-hidden="true"></span>
+</header>
+
+<main>
+
+<!-- ═══════════ PORTADA ═══════════ -->
+<section class="hero" id="inicio">
+  <div class="hero-n" id="hero-n" aria-hidden="true"><i></i></div>
+  <div class="wrap hero-in">
+    <div class="hero-txt">
+      <p class="chip"><svg class="ic"><use href="#i-pin"/></svg> IA hecha en Barranquilla, Colombia</p>
+      <h1>Asistentes de IA que atienden tu <span class="acento">WhatsApp.</span></h1>
+      <p class="lead">AXON contesta a tus clientes, toma los pedidos y coordina los domicilios de tu restaurante, de día y de noche. Tú te dedicas a cocinar.</p>
+      <div class="acciones">
+        <button class="btn btn-negro" data-video="axon-en-60s"><svg class="ic"><use href="#i-play"/></svg> Ver AXON en 60 s</button>
+        <a class="btn btn-borde" href="https://wa.me/573248874403" data-wa="Hola NITRA, quiero ver AXON funcionando.">
+          <svg class="ic"><use href="#i-chat"/></svg> Escríbenos por WhatsApp</a>
+      </div>
+    </div>
+    <button class="vcard hero-video" data-video="axon-en-60s" aria-label="Reproducir el video AXON en 60 segundos">
+      <img src="videos/axon-en-60s-h.jpg" alt="Escena del video: la carta de un restaurante y una nota de voz" width="1280" height="720">
+      <span class="play"><svg class="ic"><use href="#i-play"/></svg></span>
+      <span class="vlabel">AXON en 60 s · 1:05</span>
+    </button>
+  </div>
+</section>
+
+<!-- ═══════════ POR QUÉ AHORA ═══════════ -->
+<section class="seccion" id="por-que">
+  <div class="wrap">
+    <p class="eyebrow"><span class="nro">01</span> Por qué ahora</p>
+    <h2 class="rev">El cambio ya empezó.<br><span class="gris">En los restaurantes, apenas arranca.</span></h2>
+    <div class="stats">
+      <article class="stat rev">
+        <p class="num">2 <span>de cada</span> 3</p>
+        <div class="viz viz-tres" aria-hidden="true"><svg class="ic on"><use href="#i-tienda"/></svg><svg class="ic on"><use href="#i-tienda"/></svg><svg class="ic"><use href="#i-tienda"/></svg></div>
+        <p>pequeños y medianos negocios en Colombia ya usan inteligencia artificial.</p>
+        <a class="fuente" href="https://news.microsoft.com/es-xl/2-de-cada-3-mipymes-en-colombia-ya-usan-inteligencia-artificial-para-ganar-productividad-asegurar-continuidad-y-mejorar-el-servicio-revela-estudio-de-microsoft/" target="_blank" rel="noopener">Fuente: Microsoft, marzo de 2025</a>
+      </article>
+      <article class="stat rev">
+        <p class="num"><b data-de="78" data-a="88">88</b> %</p>
+        <div class="viz viz-barra" aria-hidden="true"><span class="antes"></span><span class="relleno"></span></div>
+        <p>de las empresas en el mundo usa IA con regularidad. Un año antes era el 78 %.</p>
+        <a class="fuente" href="https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai" target="_blank" rel="noopener">Fuente: McKinsey, «The state of AI in 2025»</a>
+      </article>
+      <article class="stat rev">
+        <p class="num">6 <span>de</span> 100</p>
+        <div class="viz viz-cien" data-on="6" aria-hidden="true"></div>
+        <p>restaurantes en Estados Unidos usa IA para tomar pedidos. Los que se mueven hoy, llegan primero.</p>
+        <a class="fuente" href="https://www.restaurantdive.com/news/national-restaurant-assocation-artificial-intelligence-adoption/812418/" target="_blank" rel="noopener">Fuente: National Restaurant Association, 2026</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ AXON ═══════════ -->
+<section class="seccion seccion-blanca" id="axon">
+  <div class="wrap">
+    <div class="cabeza">
+      <div>
+        <p class="eyebrow"><span class="nro">02</span> AXON · Para restaurantes <span class="estado"><span class="punto"></span> Disponible</span></p>
+        <h2 class="rev">AXON atiende tu restaurante por WhatsApp.</h2>
+      </div>
+      <p class="lead rev">Todo esto ya lo hace hoy. Nosotros lo dejamos listo con tu carta y tus zonas de domicilio.</p>
+    </div>
+    <div class="funciones">
+      <article class="fn rev"><span class="fi"><svg class="ic"><use href="#i-chat"/></svg></span><h3>Contesta al instante</h3><p>A cualquier hora, con tu carta y tus precios.</p></article>
+      <article class="fn rev"><span class="fi"><svg class="ic"><use href="#i-mic"/></svg></span><h3>Toma el pedido</h3><p>Como lo pide el cliente. Entiende hasta notas de voz.</p></article>
+      <article class="fn rev"><span class="fi"><svg class="ic"><use href="#i-pin"/></svg></span><h3>Calcula el domicilio</h3><p>Según la zona de entrega, y le da el total al cliente.</p></article>
+      <article class="fn rev"><span class="fi"><svg class="ic"><use href="#i-recibo"/></svg></span><h3>Pagos con un toque</h3><p>Recibe el comprobante y tú lo apruebas desde el panel.</p></article>
+      <article class="fn rev"><span class="fi"><svg class="ic"><use href="#i-moto"/></svg></span><h3>Asigna el repartidor</h3><p>Al que esté libre, con la dirección y la ubicación exacta.</p></article>
+      <article class="fn rev"><span class="fi"><svg class="ic"><use href="#i-campana"/></svg></span><h3>Avisa al cliente</h3><p>Cuando el pedido va en camino y cuando llega. Después, una encuesta.</p></article>
+      <article class="fn rev"><span class="fi"><svg class="ic"><use href="#i-grafica"/></svg></span><h3>Panel en vivo</h3><p>Cada pedido en tiempo real y tus ventas del día en Excel.</p></article>
+      <article class="fn rev"><span class="fi"><svg class="ic"><use href="#i-chispa"/></svg></span><h3>Análisis del mes</h3><p>Describe tus ventas, horarios y platos. Las decisiones son tuyas.</p></article>
+      <article class="fn rev"><span class="fi"><svg class="ic"><use href="#i-ojo"/></svg></span><h3>Vigilante 24/7</h3><p>Revisa todo cada minuto y avisa si algo se traba.</p></article>
+      <article class="fn rev"><span class="fi"><svg class="ic"><use href="#i-precio"/></svg></span><h3>Tus precios, tu decisión</h3><p>Nunca cambia precios ni promociones sin tu permiso.</p></article>
+      <article class="fn rev"><span class="fi"><svg class="ic"><use href="#i-candado"/></svg></span><h3>Datos protegidos</h3><p>Contraseñas cifradas, copia diaria fuera del servidor y Ley 1581.</p></article>
+      <article class="fn rev"><span class="fi"><svg class="ic"><use href="#i-herramienta"/></svg></span><h3>Te lo dejamos listo</h3><p>Lo configuramos con tu carta y tus zonas. Tú no instalas nada.</p></article>
+    </div>
+    <div class="centro">
+      <a class="btn btn-negro" href="https://wa.me/573248874403" data-wa="Hola NITRA, quiero AXON en mi restaurante. ¿Cómo empezamos?">
+        Quiero AXON en mi restaurante <svg class="ic"><use href="#i-flecha"/></svg></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ TUTORIALES ═══════════ -->
+<section class="seccion" id="tutoriales">
+  <div class="wrap">
+    <div class="cabeza">
+      <div>
+        <p class="eyebrow"><span class="nro">03</span> Tutoriales</p>
+        <h2 class="rev">Mira cómo funciona, paso a paso.</h2>
+      </div>
+      <p class="lead rev">Cada video tiene su propio enlace para compartir. En el celular se ve en vertical.</p>
+    </div>
+    <div class="filtros" role="group" aria-label="Filtrar tutoriales">
+      <button class="filtro activo" data-filtro="todos" aria-pressed="true">Todos</button>
+      <button class="filtro" data-filtro="empieza" aria-pressed="false">Empieza aquí</button>
+      <button class="filtro" data-filtro="paso" aria-pressed="false">Paso a paso</button>
+    </div>
+    <div class="tutoriales">
+      <article class="tut rev" id="t-axon-en-60s" data-cat="empieza">
+        <button class="vcard" data-video="axon-en-60s" aria-label="Reproducir: AXON en 60 s">
+          <img src="videos/axon-en-60s-h.jpg" alt="" loading="lazy" width="1280" height="720"><span class="play"><svg class="ic"><use href="#i-play"/></svg></span><span class="dur">1:05</span></button>
+        <div class="tut-txt"><span class="tag">Empieza aquí</span><h3>AXON en 60 s</h3><p>Todo lo que hace AXON por tu restaurante, en un minuto.</p>
+          <button class="copiar" data-copiar="axon-en-60s"><svg class="ic"><use href="#i-enlace"/></svg> <span>Copiar enlace</span></button></div>
+      </article>
+      <article class="tut rev" id="t-demo-pedido" data-cat="empieza">
+        <button class="vcard" data-video="demo-pedido" aria-label="Reproducir: Un pedido de principio a fin">
+          <img src="videos/demo-pedido-h.jpg" alt="" loading="lazy" width="1280" height="720"><span class="play"><svg class="ic"><use href="#i-play"/></svg></span><span class="dur">1:55</span></button>
+        <div class="tut-txt"><span class="tag">Empieza aquí</span><h3>Un pedido de principio a fin</h3><p>Desde el primer mensaje de la clienta hasta que el repartidor entrega.</p>
+          <button class="copiar" data-copiar="demo-pedido"><svg class="ic"><use href="#i-enlace"/></svg> <span>Copiar enlace</span></button></div>
+      </article>
+      <article class="tut rev" id="t-tutorial-panel" data-cat="paso">
+        <button class="vcard" data-video="tutorial-panel" aria-label="Reproducir: Tutorial completo del panel">
+          <img src="videos/tutorial-panel-h.jpg" alt="" loading="lazy" width="1280" height="720"><span class="play"><svg class="ic"><use href="#i-play"/></svg></span><span class="dur">4:29</span></button>
+        <div class="tut-txt"><span class="tag">Paso a paso</span><h3>Tutorial completo del panel</h3><p>Un recorrido por cada sección del panel de AXON, desde la configuración.</p>
+          <button class="copiar" data-copiar="tutorial-panel"><svg class="ic"><use href="#i-enlace"/></svg> <span>Copiar enlace</span></button></div>
+      </article>
+      <article class="tut rev" id="t-aprobar-pago" data-cat="paso">
+        <button class="vcard" data-video="aprobar-pago" aria-label="Reproducir: Aprobar un pago">
+          <img src="videos/aprobar-pago-h.jpg" alt="" loading="lazy" width="1280" height="720"><span class="play"><svg class="ic"><use href="#i-play"/></svg></span><span class="dur">1:02</span></button>
+        <div class="tut-txt"><span class="tag">Paso a paso</span><h3>Aprobar un pago</h3><p>Cómo revisar el comprobante del cliente y aprobarlo con un toque.</p>
+          <button class="copiar" data-copiar="aprobar-pago"><svg class="ic"><use href="#i-enlace"/></svg> <span>Copiar enlace</span></button></div>
+      </article>
+      <article class="tut rev" id="t-asignar-repartidor" data-cat="paso">
+        <button class="vcard" data-video="asignar-repartidor" aria-label="Reproducir: Asignar el repartidor">
+          <img src="videos/asignar-repartidor-h.jpg" alt="" loading="lazy" width="1280" height="720"><span class="play"><svg class="ic"><use href="#i-play"/></svg></span><span class="dur">1:20</span></button>
+        <div class="tut-txt"><span class="tag">Paso a paso</span><h3>Asignar el repartidor</h3><p>Cómo se registran tus repartidores y cómo les llega cada pedido.</p>
+          <button class="copiar" data-copiar="asignar-repartidor"><svg class="ic"><use href="#i-enlace"/></svg> <span>Copiar enlace</span></button></div>
+      </article>
+      <article class="tut rev" id="t-excel-ventas" data-cat="paso">
+        <button class="vcard" data-video="excel-ventas" aria-label="Reproducir: Excel de ventas del día">
+          <img src="videos/excel-ventas-h.jpg" alt="" loading="lazy" width="1280" height="720"><span class="play"><svg class="ic"><use href="#i-play"/></svg></span><span class="dur">0:57</span></button>
+        <div class="tut-txt"><span class="tag">Paso a paso</span><h3>Excel de ventas del día</h3><p>Cómo descargar el cierre del día con cada pedido entregado.</p>
+          <button class="copiar" data-copiar="excel-ventas"><svg class="ic"><use href="#i-enlace"/></svg> <span>Copiar enlace</span></button></div>
+      </article>
+    </div>
+    <p class="nota">Los videos usan un restaurante y datos de ejemplo. Las respuestas del asistente son las de AXON.</p>
+  </div>
+</section>
+
+<!-- ═══════════ PRÓXIMAMENTE ═══════════ -->
+<section class="seccion seccion-blanca" id="proximamente">
+  <div class="wrap">
+    <div class="cabeza">
+      <div>
+        <p class="eyebrow"><span class="nro">04</span> Próximamente</p>
+        <h2 class="rev">Lo que viene para otros negocios.</h2>
+      </div>
+      <p class="lead rev">Estamos terminando nuevos asistentes. Escríbenos y te avisamos apenas salgan.</p>
+    </div>
+    <div class="bots">
+      <article class="bot rev">
+        <div class="bot-top"><span class="bi"><svg class="ic"><use href="#i-tijeras"/></svg></span><span class="pronto">Próximamente</span></div>
+        <h3>BARBER IA</h3><p class="sector">Barberías</p>
+        <p>Agenda los turnos por WhatsApp, recuerda las citas y reabre el hueco cuando alguien cancela.</p>
+        <a class="mas" href="https://wa.me/573248874403" data-wa="Hola NITRA, avísenme cuando salga BARBER IA para mi barbería.">Avísame cuando salga <svg class="ic"><use href="#i-flecha"/></svg></a>
+      </article>
+      <article class="bot rev">
+        <div class="bot-top"><span class="bi"><svg class="ic"><use href="#i-audifonos"/></svg></span><span class="pronto">Próximamente</span></div>
+        <h3>CORTEX</h3><p class="sector">Empresas</p>
+        <p>Atención al cliente 24/7 con respuestas basadas en la documentación de tu empresa, y paso a una persona cuando hace falta.</p>
+        <a class="mas" href="https://wa.me/573248874403" data-wa="Hola NITRA, avísenme cuando salga CORTEX para la atención al cliente de mi empresa.">Avísame cuando salga <svg class="ic"><use href="#i-flecha"/></svg></a>
+      </article>
+      <article class="bot rev">
+        <div class="bot-top"><span class="bi"><svg class="ic"><use href="#i-birrete"/></svg></span><span class="pronto">Próximamente</span></div>
+        <h3>MENTOR IA</h3><p class="sector">Talento y Recursos Humanos</p>
+        <p>Responde las preguntas de tu equipo nuevo sobre cultura, pagos y documentos, sin cargar a Recursos Humanos.</p>
+        <a class="mas" href="https://wa.me/573248874403" data-wa="Hola NITRA, avísenme cuando salga MENTOR IA para mi equipo.">Avísame cuando salga <svg class="ic"><use href="#i-flecha"/></svg></a>
+      </article>
+      <article class="bot rev">
+        <div class="bot-top"><span class="bi"><svg class="ic"><use href="#i-laptop"/></svg></span><span class="pronto">Próximamente</span></div>
+        <h3>MAGNUS</h3><p class="sector">Asistente personal</p>
+        <p>Un asistente en tu computador que organiza tu agenda y te ayuda con las tareas del día.</p>
+        <a class="mas" href="https://wa.me/573248874403" data-wa="Hola NITRA, avísenme cuando salga MAGNUS.">Avísame cuando salga <svg class="ic"><use href="#i-flecha"/></svg></a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CONFIANZA ═══════════ -->
+<section class="seccion" id="confianza">
+  <div class="wrap">
+    <p class="eyebrow"><span class="nro">05</span> Confianza</p>
+    <h2 class="rev">Tecnología seria, con reglas claras.</h2>
+    <div class="confianza">
+      <article class="cf rev"><svg class="ic"><use href="#i-meta"/></svg><h3>WhatsApp oficial</h3><p>Funciona con la API oficial de WhatsApp de Meta, no con aplicaciones piratas.</p></article>
+      <article class="cf rev"><svg class="ic"><use href="#i-ley"/></svg><h3>Ley 1581 de 2012</h3><p>Tratamos los datos de tus clientes conforme a la ley colombiana de protección de datos.</p></article>
+      <article class="cf rev"><svg class="ic"><use href="#i-escudo"/></svg><h3>Seguridad por diseño</h3><p>Contraseñas cifradas, copias diarias fuera del servidor y cada negocio aislado de los demás.</p></article>
+      <article class="cf rev"><svg class="ic"><use href="#i-persona"/></svg><h3>Siempre honesto</h3><p>Se presenta como asistente virtual. Nunca se hace pasar por una persona.</p></article>
+    </div>
+    <p class="cita rev">«La IA propone, el sistema decide.»</p>
+  </div>
+</section>
+
+<!-- ═══════════ NOSOTROS ═══════════ -->
+<section class="seccion seccion-blanca" id="nosotros">
+  <div class="wrap nos">
+    <div class="nos-txt">
+      <p class="eyebrow"><span class="nro">06</span> Quiénes somos</p>
+      <h2 class="rev">Inteligencia artificial real para los negocios que <span class="acento">mueven a Colombia.</span></h2>
+      <p class="rev">NITRA es una agencia de adopción tecnológica y automatización avanzada. Desarrollamos e implementamos herramientas prácticas de inteligencia artificial para que las empresas y emprendedores de todo el país multipliquen su productividad, optimicen sus costos fijos y compitan sin desventajas en la economía digital global.</p>
+      <p class="rev gris">Nacimos con la firme convicción de que las limitaciones de infraestructura o presupuesto no deben definir el techo de innovación de una empresa. El talento nacional merece competir con herramientas globales.</p>
+      <div class="fundadores rev">
+        <div class="fund"><span class="ini">EA</span><div><b>Esteban Arévalo Molina</b><small>Cofundador</small></div></div>
+        <div class="fund"><span class="ini">JA</span><div><b>Jesús Arévalo Molina</b><small>Cofundador</small></div></div>
+      </div>
+    </div>
+    <button class="vcard oscura rev" id="t-presentacion" data-video="presentacion" aria-label="Reproducir: Conoce NITRA">
+      <img src="videos/presentacion-h.jpg" alt="Logo de NITRA, desarrolladora del futuro" loading="lazy" width="1280" height="720">
+      <span class="play"><svg class="ic"><use href="#i-play"/></svg></span><span class="vlabel">Conoce NITRA · 0:45</span>
+    </button>
+  </div>
+</section>
+
+<!-- ═══════════ LLAMADO FINAL ═══════════ -->
+<section class="seccion" id="contacto">
+  <div class="wrap">
+    <div class="final rev">
+      <svg class="red-final" id="red-final" aria-hidden="true"></svg>
+      <img class="final-n" src="assets/n-linea-blanca.png" alt="" width="96" height="69">
+      <p class="eyebrow eyebrow-claro"><span class="nro">07</span> Tu turno</p>
+      <h2>¿Tú qué esperas?</h2>
+      <p>Escríbenos y te mostramos AXON funcionando con un restaurante de ejemplo.</p>
+      <div class="acciones">
+        <a class="btn btn-blanco" href="https://wa.me/573248874403" data-wa="Hola NITRA, quiero que me muestren AXON.">
+          <svg class="ic"><use href="#i-chat"/></svg> Escríbenos por WhatsApp</a>
+        <button class="btn btn-borde-blanco" id="t-que-esperas" data-video="que-esperas"><svg class="ic"><use href="#i-play"/></svg> Ver el video</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ═══════════ PIE ═══════════ -->
+<footer class="pie">
+  <div class="wrap pie-in">
+    <div class="pie-marca">
+      <a class="marca" href="#inicio"><img src="assets/n-linea.png" alt="" width="40" height="28"><span>NITRA</span></a>
+      <p>IA de frontera, al alcance del emprendedor colombiano. La misma tecnología de las grandes, para tu negocio.</p>
+    </div>
+    <div class="pie-col">
+      <h4>Producto</h4>
+      <a href="#axon">AXON para restaurantes</a>
+      <a href="#tutoriales">Tutoriales</a>
+      <a href="#proximamente">Próximamente</a>
+    </div>
+    <div class="pie-col">
+      <h4>NITRA</h4>
+      <a href="#nosotros">Quiénes somos</a>
+      <a href="#confianza">Confianza</a>
+    </div>
+    <div class="pie-col">
+      <h4>Contacto</h4>
+      <a href="https://wa.me/573248874403" data-wa="Hola NITRA, quiero más información."><svg class="ic"><use href="#i-chat"/></svg> WhatsApp</a>
+      <a href="mailto:novalabscolombia@gmail.com"><svg class="ic"><use href="#i-correo"/></svg> novalabscolombia@gmail.com</a>
+      <a href="https://www.instagram.com/nitralabs/" target="_blank" rel="noopener"><svg class="ic"><use href="#i-insta"/></svg> @nitralabs</a>
+    </div>
+  </div>
+  <div class="wrap pie-legal">
+    <p>© 2026 NITRA S.A.S. · Barranquilla, Colombia · Todos los derechos reservados</p>
+    <p>NITRA es una marca de Agenciadeia</p>
+  </div>
+</footer>
+
+<!-- ═══════════ REPRODUCTOR ═══════════ -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" hidden>
+  <div class="modal-caja">
+    <button class="modal-cerrar" id="modal-cerrar" aria-label="Cerrar el video"><svg class="ic"><use href="#i-cerrar"/></svg></button>
+    <video id="modal-video" controls playsinline preload="metadata"></video>
+    <div class="modal-pie">
+      <p id="modal-titulo"></p>
+      <button class="copiar copiar-claro" id="modal-copiar"><svg class="ic"><use href="#i-enlace"/></svg> <span>Copiar enlace</span></button>
+    </div>
+  </div>
+</div>
+
+<noscript><p class="sin-js">NITRA — Asistentes de IA para WhatsApp · NITRA es una marca de Agenciadeia · Barranquilla, Colombia</p></noscript>
+<script src="app.js" defer></script>
 </body>
 </html>
